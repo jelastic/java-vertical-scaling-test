@@ -31,7 +31,7 @@ public class Test {
             test = null;
 
             Thread.sleep(10000);
-            //System.gc();
+            System.gc();
         }
     }
 
