@@ -1,0 +1,75 @@
+type: install
+id: java-memory-usage-demo
+name: Java Vertical Scaling
+description: |
+  Java vertical scaling test: 
+  * Shenandoah @ AdoptOpenJDK
+  * ZGC @ Oracle OpenJDK
+  * G1 @ Liberica
+  * Epsilon @ Zulu
+  * OpenJ9  
+logo: https://raw.githubusercontent.com/jelastic-jps/java-memory-agent/master/images/java-agent-logo.png
+globals: 
+  cloudlets: 24
+  common: -Xmx3g -Xms32m -XX:+UseCompressedOops
+nodes:
+  - nodeType: javaengine
+    tag: adoptopenjdk-12.0.2
+    nodeGroup: adopt
+    cloudlets: ${globals.cloudlets}
+    displayName: Shenandoah @ AdoptOpenJDK
+    startService: false
+    env:
+      _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions -XX:+UseShenandoahGC -XX:ShenandoahGCHeuristics=compact 
+
+  - nodeType: javaengine
+    tag: openjdk-13.ea-b31
+    nodeGroup: oracle
+    cloudlets: ${globals.cloudlets}
+    displayName: ZGC @ Oracle OpenJDK
+    startService: false
+    env:
+      _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:ZUncommitDelay=10
+
+  - nodeType: javaengine
+    tag: libericajdk-12.0.2
+    nodeGroup: liberica
+    cloudlets: ${globals.cloudlets}
+    displayName: G1 @ Liberica
+    startService: false
+    env:
+      _JAVA_OPTIONS: ${globals.common} -XX:+UseG1GC -XX:G1PeriodicGCInterval=10k
+
+  - nodeType: javaengine
+    tag: zulujdk-12.0.2
+    nodeGroup: zulu
+    cloudlets: ${globals.cloudlets}
+    displayName: Epsilon @ Zulu
+    startService: false
+    env:
+      _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC
+
+  - nodeType: javaengine
+    tag: openj9-0.15.1-12.0.2
+    nodeGroup: openj9
+    cloudlets: ${globals.cloudlets}
+    displayName: OpenJ9
+    startService: false
+    env:
+      OPENJ9_JAVA_OPTIONS: ${globals.common} -XX:+IdleTuningCompactOnIdle -XX:+IdleTuningGcOnIdle -XX:IdleTuningMinIdleWaitTime=10 -Xjit:waitTimeToEnterDeepIdleMode=10000
+
+onInstall:
+  - cmd[*]: |-
+      chmod 775 /var/run/screen
+      chmod 777 /var/log/run.log
+      java --uninstall
+    user: root
+  - cmd[*]: |-
+      wget https://github.com/jelastic/java-vertical-scaling-test/raw/master/dist/app.jar
+      screen -dm bash -c "(echo -ne '\n' && cat) | java -jar app.jar 10 &>> /var/log/run.log"
+
+# Run mannually for OpenJ9 memory usage check 
+#      while true; do
+#        ps -orss --no-headers --pid $(pgrep -f java | tail -n1)
+#        sleep 1
+#      done
