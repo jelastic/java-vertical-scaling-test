@@ -1,16 +1,18 @@
 type: install
 id: java-memory-usage-demo
 name: Java Vertical Scaling
+homepage: https://github.com/jelastic/java-vertical-scaling-test
 description: |
   Java vertical scaling test: 
   * Shenandoah @ AdoptOpenJDK
   * ZGC @ Oracle OpenJDK
   * G1 @ Liberica
-  * Epsilon @ Zulu
+  * C4 @ Zing
   * OpenJ9  
+  * Epsilon @ Zulu
 logo: https://raw.githubusercontent.com/jelastic-jps/java-memory-agent/master/images/java-agent-logo.png
 globals: 
-  cloudlets: 24
+  cloudlets: 26
   common: -Xmx3g -Xms32m -XX:+UseCompressedOops
 nodes:
   - nodeType: javaengine
@@ -19,18 +21,19 @@ nodes:
     cloudlets: ${globals.cloudlets}
     displayName: Shenandoah @ AdoptOpenJDK
     startService: false
+    #-XX:ShenandoahGCHeuristics=compact is very agressive mode 
     env:
       _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions -XX:+UseShenandoahGC -XX:ShenandoahGCHeuristics=compact 
-
   - nodeType: javaengine
     tag: openjdk-13.ea-b31
     nodeGroup: oracle
     cloudlets: ${globals.cloudlets}
     displayName: ZGC @ Oracle OpenJDK
     startService: false
+    #-XX:ZUncommitDelay=1 -XX:ZCollectionInterval=30 is very agressive mode as well, similar to Shenandoah
     env:
-      _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:ZUncommitDelay=10
-
+      _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:ZUncommitDelay=1 -XX:ZCollectionInterval=30
+      
   - nodeType: javaengine
     tag: libericajdk-12.0.2
     nodeGroup: liberica
@@ -38,7 +41,7 @@ nodes:
     displayName: G1 @ Liberica
     startService: false
     env:
-      _JAVA_OPTIONS: ${globals.common} -XX:+UseG1GC -XX:G1PeriodicGCInterval=10k
+      _JAVA_OPTIONS: ${globals.common} -XX:+UseG1GC -XX:G1PeriodicGCInterval=1k
 
   - nodeType: javaengine
     tag: zulujdk-12.0.2
@@ -56,7 +59,15 @@ nodes:
     displayName: OpenJ9
     startService: false
     env:
-      OPENJ9_JAVA_OPTIONS: ${globals.common} -XX:+IdleTuningCompactOnIdle -XX:+IdleTuningGcOnIdle -XX:IdleTuningMinIdleWaitTime=10 -Xjit:waitTimeToEnterDeepIdleMode=10000
+      OPENJ9_JAVA_OPTIONS: ${globals.common} -XX:+IdleTuningCompactOnIdle -XX:+IdleTuningGcOnIdle -XX:IdleTuningMinIdleWaitTime=1 -Xjit:waitTimeToEnterDeepIdleMode=1000
+
+  - image: devbeta/javaengine:zing-11.0.0
+    nodeGroup: zing
+    cloudlets: ${globals.cloudlets}
+    displayName: C4 @ Zing 
+    startService: false
+    env:
+      _JAVA_OPTIONS: ${globals.common} -XX:-AutoTuneResourceDefaultsBasedOnXmx
 
 onInstall:
   - cmd[*]: |-
@@ -66,9 +77,9 @@ onInstall:
     user: root
   - cmd[*]: |-
       wget https://github.com/jelastic/java-vertical-scaling-test/raw/master/dist/app.jar
-      screen -dm bash -c "(echo -ne '\n' && cat) | java -jar app.jar 10 &>> /var/log/run.log"
+      screen -dm bash -c "(echo -ne '\n' && cat) | java -jar app.jar 30 &>> /var/log/run.log"
 
-# Run mannually for OpenJ9 memory usage check 
+#  OpenJ9 memory usage should be tracked in a tricky way 
 #      while true; do
 #        ps -orss --no-headers --pid $(pgrep -f java | tail -n1)
 #        sleep 1
