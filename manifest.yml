@@ -77,7 +77,7 @@ onInstall:
     user: root
   - cmd[*]: |-
       wget https://github.com/jelastic/java-vertical-scaling-test/raw/master/dist/app.jar
-      screen -dm bash -c "(echo -ne '\n' && cat) | java -jar app.jar 30 &>> /var/log/run.log"
+      screen -dm bash -c "echo -ne '\n' | java -jar app.jar 30 &>> /var/log/run.log"
 
 #  OpenJ9 memory usage should be tracked in a tricky way 
 #      while true; do
