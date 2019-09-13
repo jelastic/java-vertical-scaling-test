@@ -16,39 +16,6 @@ name: Java Vertical Scaling on Kubernetes
 logo: https://github.com/jelastic/java-vertical-scaling-test/raw/master/kubernetes/images/kube.png
 baseUrl: https://raw.githubusercontent.com/jelastic/java-vertical-scaling-test/master/kubernetes
 
-settings:
-  fields:
-  - type: string
-    name: zulujdkLimit
-    caption: Zulu Pod Mem Limit
-    default: ${globals.limit}
-    inputType: hidden
-  - type: string
-    name: libericaLimit
-    caption: Liberica Pod Mem Limit
-    default: ${globals.limit}
-    inputType: hidden
-  - type: string
-    name: adoptopenjdkLimit
-    caption: AdoptOpenJDK Pod Mem Limit
-    default: ${globals.limit}
-    inputType: hidden
-  - type: string
-    name: openj9Limit
-    caption: OpenJ9 Pod Mem Limit
-    default: ${globals.limit}
-    inputType: hidden
-  - type: string
-    name: openjdkLimit
-    caption: OpenJDK13 Pod Mem Limit
-    default: ${globals.limit}
-    inputType: hidden
-  - type: string
-    name: zingLimit
-    caption: Zing Pod Mem Limit
-    default: ${globals.limit}
-    inputType: hidden
-
 globals:
   limit: 4Gi 
   common: -Xmx3g -Xms32m -XX:+UseCompressedOops
@@ -119,12 +86,12 @@ actions:
        wget ${baseUrl}/java-dashboard.json
        export grafana_secret=$(kubectl get secret --namespace kubernetes-monitoring monitoring-grafana -o jsonpath='{.data.admin-password}' | base64 --decode ; echo)
        curl -s -k -u "admin:${grafana_secret}" -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d @java-dashboard.json  http://${env.domain}/grafana/api/dashboards/db/
-       curl ${baseUrl}/deployments/adoptopenjdk.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.adoptopenjdk}/g" | sed "s/%MEM_LIMIT%/${settings.adoptopenjdkLimit}/g" | kubectl apply -f -
-       curl ${baseUrl}/deployments/libericajdk12.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.liberica}/g" | sed "s/%MEM_LIMIT%/${settings.libericaLimit}/g" | kubectl apply -f -
-       curl ${baseUrl}/deployments/openj9.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.openj9}/g" | sed "s/%MEM_LIMIT%/${settings.openj9Limit}/g" | kubectl apply -f -
-       curl ${baseUrl}/deployments/openjdk13.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.openjdk}/g" | sed "s/%MEM_LIMIT%/${settings.openjdkLimit}/g" | kubectl apply -f -
-       curl ${baseUrl}/deployments/zulujdk.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.zulujdk}/g" | sed "s/%MEM_LIMIT%/${settings.zulujdkLimit}/g" | kubectl apply -f -
-       curl ${baseUrl}/deployments/zing.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.zing}/g" | sed "s/%MEM_LIMIT%/${settings.zingLimit}/g" | kubectl apply -f -
+       curl ${baseUrl}/deployments/adoptopenjdk.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.adoptopenjdk}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | kubectl apply -f -
+       curl ${baseUrl}/deployments/libericajdk12.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.liberica}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | kubectl apply -f -
+       curl ${baseUrl}/deployments/openj9.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.openj9}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | kubectl apply -f -
+       curl ${baseUrl}/deployments/openjdk13.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.openjdk}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | kubectl apply -f -
+       curl ${baseUrl}/deployments/zulujdk.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.zulujdk}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | kubectl apply -f -
+       curl ${baseUrl}/deployments/zing.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.zing}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | kubectl apply -f -
 
   getPods:
       - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-zulujdk -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
