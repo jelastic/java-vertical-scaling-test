@@ -82,7 +82,8 @@ actions:
   setCloudlets:
     env.control.SetCloudletsCountByGroup:
       nodeGroup: cp
-      count: ${globals.cloudlets}
+      fixedCloudlets: 1
+      flexibleCloudlets: ${globals.cloudlets}
 
   deploy:
     - cmd [${nodes.k8sm.master.id}]: |-
