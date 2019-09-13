@@ -15,7 +15,7 @@ description: |
   * Serial @ Zulu
   * CMS @ Zulu
   * Parallel @ Zulu
-  * Serial @ Zulu
+
 globals: 
   cloudlets: 26
   common: -Xmx3g -Xms32m -XX:+UseCompressedOops
