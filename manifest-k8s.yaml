@@ -13,8 +13,8 @@ description: |
 
 
 name: Java Vertical Scaling on Kubernetes
-logo: https://raw.githubusercontent.com/jelastic-jps/java-memory-agent/master/kubernetes/images/kube.png
-baseUrl: https://raw.githubusercontent.com/jelastic-jps/java-memory-agent/kubernetes/master
+logo: https://github.com/jelastic/java-vertical-scaling-test/raw/master/kubernetes/images/kube.png
+baseUrl: https://raw.githubusercontent.com/jelastic/java-vertical-scaling-test/master/kubernetes
 
 settings:
   fields:
