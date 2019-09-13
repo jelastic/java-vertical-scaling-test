@@ -18,6 +18,7 @@ baseUrl: https://raw.githubusercontent.com/jelastic/java-vertical-scaling-test/m
 
 globals:
   limit: 4Gi 
+  cloudlets: 40
   common: -Xmx3g -Xms32m -XX:+UseCompressedOops
   zing: -XX:-AutoTuneResourceDefaultsBasedOnXmx
   openjdk: -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:ZUncommitDelay=1 -XX:ZCollectionInterval=30
@@ -29,6 +30,7 @@ globals:
 onInstall:
  - labelNodes
  - renameNodes
+ - setCloudlets
  - deploy
  - getPods
 actions:
@@ -77,6 +79,10 @@ actions:
           envName: ${env.name}
           nodeId: ${globals.zingNode}
           displayName: zingNode
+  setCloudlets:
+    env.control.SetCloudletsCountByGroup:
+      nodeGroup: cp
+      count: ${globals.cloudlets}
 
   deploy:
     - cmd [${nodes.k8sm.master.id}]: |-
