@@ -21,35 +21,36 @@ settings:
   - type: string
     name: zulujdkLimit
     caption: Zulu Pod Mem Limit
-    default: 3Gi
+    default: ${globals.limit}
     inputType: hidden
   - type: string
     name: libericaLimit
     caption: Liberica Pod Mem Limit
-    default: 3Gi
+    default: ${globals.limit}
     inputType: hidden
   - type: string
     name: adoptopenjdkLimit
     caption: AdoptOpenJDK Pod Mem Limit
-    default: 3Gi
+    default: ${globals.limit}
     inputType: hidden
   - type: string
     name: openj9Limit
     caption: OpenJ9 Pod Mem Limit
-    default: 3Gi
+    default: ${globals.limit}
     inputType: hidden
   - type: string
     name: openjdkLimit
     caption: OpenJDK13 Pod Mem Limit
-    default: 3Gi
+    default: ${globals.limit}
     inputType: hidden
   - type: string
     name: zingLimit
     caption: Zing Pod Mem Limit
-    default: 3Gi
+    default: ${globals.limit}
     inputType: hidden
 
 globals:
+  limit: 4Gi 
   common: -Xmx3g -Xms32m -XX:+UseCompressedOops
   zing: -XX:-AutoTuneResourceDefaultsBasedOnXmx
   openjdk: -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:ZUncommitDelay=1 -XX:ZCollectionInterval=30
