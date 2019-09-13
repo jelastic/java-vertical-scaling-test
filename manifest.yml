@@ -12,13 +12,17 @@ description: |
   * C4 @ Zing
   * OpenJ9  
   * Epsilon @ Zulu
+  * Serial @ Zulu
+  * CMS @ Zulu
+  * Parallel @ Zulu
+  * Serial @ Zulu
 globals: 
   cloudlets: 26
   common: -Xmx3g -Xms32m -XX:+UseCompressedOops
 nodes:
   - nodeType: javaengine
     tag: adoptopenjdk-12.0.2
-    nodeGroup: adopt
+    nodeGroup: shenan
     cloudlets: ${globals.cloudlets}
     displayName: Shenandoah @ AdoptOpenJDK
     startService: false
@@ -27,7 +31,7 @@ nodes:
       _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions -XX:+UseShenandoahGC -XX:ShenandoahGCHeuristics=compact 
   - nodeType: javaengine
     tag: openjdk-13.ea-b31
-    nodeGroup: oracle
+    nodeGroup: zgc
     cloudlets: ${globals.cloudlets}
     displayName: ZGC @ Oracle OpenJDK
     startService: false
@@ -37,7 +41,7 @@ nodes:
       
   - nodeType: javaengine
     tag: libericajdk-12.0.2
-    nodeGroup: liberica
+    nodeGroup: g1
     cloudlets: ${globals.cloudlets}
     displayName: G1 @ Liberica
     startService: false
@@ -46,7 +50,7 @@ nodes:
 
   - nodeType: javaengine
     tag: zulujdk-12.0.2
-    nodeGroup: zulu
+    nodeGroup: epsilon
     cloudlets: ${globals.cloudlets}
     displayName: Epsilon @ Zulu
     startService: false
@@ -69,6 +73,34 @@ nodes:
     startService: false
     env:
       _JAVA_OPTIONS: ${globals.common} -XX:-AutoTuneResourceDefaultsBasedOnXmx
+      
+  - nodeType: javaengine
+    tag: zulujdk-12.0.2
+    nodeGroup: cms
+    cloudlets: ${globals.cloudlets}
+    displayName: ConcMarkSweep @ Zulu
+    startService: false
+    env:
+      _JAVA_OPTIONS: ${globals.common} -XX:+UseConcMarkSweepGC
+
+  - nodeType: javaengine
+    tag: zulujdk-12.0.2
+    nodeGroup: parallel
+    cloudlets: ${globals.cloudlets}
+    displayName: Parallel @ Zulu
+    startService: false
+    env:
+      _JAVA_OPTIONS: ${globals.common} -XX:+UseParallelGC
+
+  - nodeType: javaengine
+    tag: zulujdk-12.0.2
+    nodeGroup: serial
+    cloudlets: ${globals.cloudlets}
+    displayName: Serial @ Zulu
+    startService: false
+    env:
+      _JAVA_OPTIONS: ${globals.common} -XX:+UseSerialGC
+
 
 onInstall:
   - cmd[*]: |-
@@ -79,9 +111,11 @@ onInstall:
   - cmd[*]: |-
       wget https://github.com/jelastic/java-vertical-scaling-test/raw/master/dist/app.jar
       screen -dm bash -c "echo -ne '\n' | java -jar app.jar 30 &>> /var/log/run.log"
+  - cmd[serial, cms, parallel, epsilon]: |-
+      screen -dm bash -c 'sleep 120; while true; do a="app"; j=".jar"; /usr/java/latest/bin/jcmd $(pgrep -f $a$j | tail -n1) GC.run &>> /var/log/run.log; sleep 20; done;'  
 
 #  OpenJ9 memory usage should be tracked in a tricky way 
 #      while true; do
-#        ps -orss --no-headers --pid $(pgrep -f java | tail -n1)
+#        ps -orss --no-headers --pid $(pgrep -f java | tail -n1) 
 #        sleep 1
 #      done
