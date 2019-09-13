@@ -1,0 +1,158 @@
+type: update
+description: |
+    Java vertical scaling test on Kubernetes:
+    * Shenandoah @ AdoptOpenJDK
+    * ZGC @ Oracle OpenJDK
+    * G1 @ Liberica
+    * C4 @ Zing
+    * OpenJ9
+    * Epsilon @ Zulu
+
+    **Important!** Apply this Add-On to a Kubernetes Cluster with **6** worker nodes.
+    Each pod is deployed to its dedicated labeled node to easily track memory utilization.
+
+
+name: Java Vertical Scaling on Kubernetes
+logo: https://raw.githubusercontent.com/jelastic-jps/java-memory-agent/master/kubernetes/images/kube.png
+baseUrl: https://raw.githubusercontent.com/jelastic-jps/java-memory-agent/kubernetes/master
+
+settings:
+  fields:
+  - type: string
+    name: zulujdkLimit
+    caption: Zulu Pod Mem Limit
+    default: 3Gi
+    inputType: hidden
+  - type: string
+    name: libericaLimit
+    caption: Liberica Pod Mem Limit
+    default: 3Gi
+    inputType: hidden
+  - type: string
+    name: adoptopenjdkLimit
+    caption: AdoptOpenJDK Pod Mem Limit
+    default: 3Gi
+    inputType: hidden
+  - type: string
+    name: openj9Limit
+    caption: OpenJ9 Pod Mem Limit
+    default: 3Gi
+    inputType: hidden
+  - type: string
+    name: openjdkLimit
+    caption: OpenJDK13 Pod Mem Limit
+    default: 3Gi
+    inputType: hidden
+  - type: string
+    name: zingLimit
+    caption: Zing Pod Mem Limit
+    default: 3Gi
+    inputType: hidden
+
+globals:
+  common: -Xmx3g -Xms32m -XX:+UseCompressedOops
+  zing: -XX:-AutoTuneResourceDefaultsBasedOnXmx
+  openjdk: -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:ZUncommitDelay=1 -XX:ZCollectionInterval=30
+  openj9: -XX:+IdleTuningCompactOnIdle -XX:+IdleTuningGcOnIdle -XX:IdleTuningMinIdleWaitTime=1 -Xjit:waitTimeToEnterDeepIdleMode=1000
+  adoptopenjdk: -XX:+UnlockExperimentalVMOptions -XX:+UseShenandoahGC -XX:ShenandoahGCHeuristics=compact
+  liberica: -XX:+UseG1GC -XX:G1PeriodicGCInterval=10k
+  zulujdk: -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC
+
+onInstall:
+ - labelNodes
+ - renameNodes
+ - deploy
+ - getPods
+actions:
+  labelNodes:
+    - cmd [${nodes.k8sm.master.id}]: curl ${baseUrl}/scripts/labelnodes.sh | bash
+    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=java=zulujdk --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
+    - setGlobals:
+        zuluNode: ${response.out}
+    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=java=openjdk --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
+    - setGlobals:
+        openjdkNode: ${response.out}
+    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=java=adoptjdk --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
+    - setGlobals:
+        adoptjdkNode: ${response.out}
+    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=java=openj9 --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
+    - setGlobals:
+        openj9Node: ${response.out}
+    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=java=liberica --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
+    - setGlobals:
+        libericaNode: ${response.out}
+    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=java=zing --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
+    - setGlobals:
+        zingNode: ${response.out}
+  renameNodes:
+     - jelastic.environment.control.SetNodeDisplayName:
+          envName: ${env.name}
+          nodeId: ${globals.zuluNode}
+          displayName: zuluJdkNode
+     - jelastic.environment.control.SetNodeDisplayName:
+          envName: ${env.name}
+          nodeId: ${globals.openjdkNode}
+          displayName: openjdkNode
+     - jelastic.environment.control.SetNodeDisplayName:
+          envName: ${env.name}
+          nodeId: ${globals.adoptjdkNode}
+          displayName: adoptjdkNode
+     - jelastic.environment.control.SetNodeDisplayName:
+          envName: ${env.name}
+          nodeId: ${globals.openj9Node}
+          displayName: openj9Node
+     - jelastic.environment.control.SetNodeDisplayName:
+          envName: ${env.name}
+          nodeId: ${globals.libericaNode}
+          displayName: libericaNode
+     - jelastic.environment.control.SetNodeDisplayName:
+          envName: ${env.name}
+          nodeId: ${globals.zingNode}
+          displayName: zingNode
+
+  deploy:
+    - cmd [${nodes.k8sm.master.id}]: |-
+       kubectl create namespace java || true
+       kubectl delete deployment --force --grace-period=0 -l=app=java -n java || true
+       kubectl delete pods -n java $(kubectl get pods -l=app=java -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}') --force --grace-period=0 || true
+       wget ${baseUrl}/java-dashboard.json
+       export grafana_secret=$(kubectl get secret --namespace kubernetes-monitoring monitoring-grafana -o jsonpath='{.data.admin-password}' | base64 --decode ; echo)
+       curl -s -k -u "admin:${grafana_secret}" -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d @java-dashboard.json  http://${env.domain}/grafana/api/dashboards/db/
+       curl ${baseUrl}/deployments/adoptopenjdk.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.adoptopenjdk}/g" | sed "s/%MEM_LIMIT%/${settings.adoptopenjdkLimit}/g" | kubectl apply -f -
+       curl ${baseUrl}/deployments/libericajdk12.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.liberica}/g" | sed "s/%MEM_LIMIT%/${settings.libericaLimit}/g" | kubectl apply -f -
+       curl ${baseUrl}/deployments/openj9.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.openj9}/g" | sed "s/%MEM_LIMIT%/${settings.openj9Limit}/g" | kubectl apply -f -
+       curl ${baseUrl}/deployments/openjdk13.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.openjdk}/g" | sed "s/%MEM_LIMIT%/${settings.openjdkLimit}/g" | kubectl apply -f -
+       curl ${baseUrl}/deployments/zulujdk.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.zulujdk}/g" | sed "s/%MEM_LIMIT%/${settings.zulujdkLimit}/g" | kubectl apply -f -
+       curl ${baseUrl}/deployments/zing.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.zing}/g" | sed "s/%MEM_LIMIT%/${settings.zingLimit}/g" | kubectl apply -f -
+
+  getPods:
+      - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-zulujdk -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
+      - setGlobals:
+          zuluPod: ${response.out}
+      - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-adoptopenjdk -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
+      - setGlobals:
+          adoptOpenJDKPod: ${response.out}
+      - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-libericajdk -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
+      - setGlobals:
+          libericajdkPod: ${response.out}
+      - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-openj9 -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
+      - setGlobals:
+          openj9Pod: ${response.out}
+      - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-openjdk -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
+      - setGlobals:
+          openjdkPod: ${response.out}
+      - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-zing -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
+      - setGlobals:
+          zingPod: ${response.out}
+      - setGlobals:
+          success: |
+              Pods have been deployed to namespace java.
+
+              Get pods: `kubectl get pods -n java`
+
+              Get deployments: `kubectl get deployments -n java`
+
+              Get logs: `kubectl logs -f $deploymentName -n java`
+
+              For monitoring Navigate to Grafana [${env.url}grafana/dashboards](${env.url}grafana/dashboards) and select Java dashboard
+success: ${globals.success}
