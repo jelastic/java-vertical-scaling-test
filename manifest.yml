@@ -1,7 +1,9 @@
 type: install
 id: java-memory-usage-demo
 name: Java Vertical Scaling
+baseUrl: https://raw.githubusercontent.com/jelastic/java-vertical-scaling-test/master
 homepage: https://github.com/jelastic/java-vertical-scaling-test
+logo: /images/elastic-duke-70x70.png
 description: |
   Java vertical scaling test: 
   * Shenandoah @ AdoptOpenJDK
@@ -10,7 +12,6 @@ description: |
   * C4 @ Zing
   * OpenJ9  
   * Epsilon @ Zulu
-logo: https://raw.githubusercontent.com/jelastic-jps/java-memory-agent/master/images/java-agent-logo.png
 globals: 
   cloudlets: 26
   common: -Xmx3g -Xms32m -XX:+UseCompressedOops
