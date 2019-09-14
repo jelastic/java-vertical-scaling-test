@@ -23,7 +23,7 @@ spec:
           resources:
             limits:
               memory: %MEM_LIMIT%
-          image: adoptopenjdk:12.0.2_10-jre-openj9-0.15.1
+          image: adoptopenjdk:latest
           imagePullPolicy: Always
           command: ["/bin/bash", "-c", "curl -L https://github.com/jelastic/java-vertical-scaling-test/raw/master/dist/app.jar --output app.jar && sleep 10 && echo -ne '\n' | java %JAVA_OPTS% -jar app.jar 30"]
       nodeSelector:
