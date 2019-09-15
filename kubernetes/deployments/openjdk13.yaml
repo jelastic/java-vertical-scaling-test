@@ -23,8 +23,11 @@ spec:
           resources:
             limits:
               memory: %MEM_LIMIT%
-          image: openjdk:13
+          image: jelastic/javaengine:openjdk-13.ea-b31
           imagePullPolicy: Always
-          command: ["/bin/bash", "-c", "curl -L https://github.com/jelastic/java-vertical-scaling-test/raw/master/dist/app.jar --output app.jar && sleep 10 && echo -ne '\n' | java %JAVA_OPTS% -jar app.jar 30"]
+          env:
+          - name: JAVA_OPTS
+            value: %JAVA_OPTS%
+          command: ["/bin/bash", "-c", "curl -L https://github.com/jelastic/java-vertical-scaling-test/raw/master/dist/app.jar --output app.jar && sleep 3 && %CMD%"]
       nodeSelector:
         java: openjdk
