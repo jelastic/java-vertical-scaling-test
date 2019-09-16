@@ -6,25 +6,25 @@ homepage: https://github.com/jelastic/java-vertical-scaling-test
 logo: /images/elastic-duke-70x70.png
 description: |
   Java vertical scaling test: 
-  * Shenandoah @ AdoptOpenJDK
+  * G1 
+  * Shenandoah
   * ZGC @ Oracle OpenJDK
-  * G1 @ Liberica
   * C4 @ Zing
   * OpenJ9  
-  * Epsilon @ Zulu
-  * Serial @ Zulu
-  * CMS @ Zulu
-  * Parallel @ Zulu
+  * Serial
+  * CMS
+  * Epsilon
+  * Parallel
 
 globals: 
   cloudlets: 26
   common: -Xmx3g -Xms32m -XX:+UseCompressedOops
 nodes:
   - nodeType: javaengine
-    tag: adoptopenjdk-12.0.2
+    tag: zulujdk-12.0.2
     nodeGroup: shenan
     cloudlets: ${globals.cloudlets}
-    displayName: Shenandoah @ AdoptOpenJDK
+    displayName: Shenandoah
     startService: false
     #-XX:ShenandoahGCHeuristics=compact is very agressive mode 
     env:
@@ -40,10 +40,10 @@ nodes:
       _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:ZUncommitDelay=1 -XX:ZCollectionInterval=30
       
   - nodeType: javaengine
-    tag: libericajdk-12.0.2
+    tag: zulujdk-12.0.2
     nodeGroup: g1
     cloudlets: ${globals.cloudlets}
-    displayName: G1 @ Liberica
+    displayName: G1
     startService: false
     env:
       _JAVA_OPTIONS: ${globals.common} -XX:+UseG1GC -XX:G1PeriodicGCInterval=1k
@@ -52,7 +52,7 @@ nodes:
     tag: zulujdk-12.0.2
     nodeGroup: epsilon
     cloudlets: ${globals.cloudlets}
-    displayName: Epsilon @ Zulu
+    displayName: Epsilon
     startService: false
     env:
       _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC
@@ -72,13 +72,13 @@ nodes:
     displayName: C4 @ Zing 
     startService: false
     env:
-      _JAVA_OPTIONS: ${globals.common} -XX:-AutoTuneResourceDefaultsBasedOnXmx
+      _JAVA_OPTIONS: -Xmx500m -Xms32m -XX:+UseCompressedOops -XX:+UseZST
       
   - nodeType: javaengine
     tag: zulujdk-12.0.2
     nodeGroup: cms
     cloudlets: ${globals.cloudlets}
-    displayName: ConcMarkSweep @ Zulu
+    displayName: ConcMarkSweep
     startService: false
     env:
       _JAVA_OPTIONS: ${globals.common} -XX:+UseConcMarkSweepGC
@@ -87,7 +87,7 @@ nodes:
     tag: zulujdk-12.0.2
     nodeGroup: parallel
     cloudlets: ${globals.cloudlets}
-    displayName: Parallel @ Zulu
+    displayName: Parallel
     startService: false
     env:
       _JAVA_OPTIONS: ${globals.common} -XX:+UseParallelGC
@@ -96,7 +96,7 @@ nodes:
     tag: zulujdk-12.0.2
     nodeGroup: serial
     cloudlets: ${globals.cloudlets}
-    displayName: Serial @ Zulu
+    displayName: Serial
     startService: false
     env:
       _JAVA_OPTIONS: ${globals.common} -XX:+UseSerialGC
@@ -110,12 +110,9 @@ onInstall:
     user: root
   - cmd[*]: |-
       wget https://github.com/jelastic/java-vertical-scaling-test/raw/master/dist/app.jar
-      screen -dm bash -c "echo -ne '\n' | java -jar app.jar 30 &>> /var/log/run.log"
+      screen -dm bash -c "echo -ne '\n' | java -jar app.jar 100 2 &>> /var/log/run.log"
   - cmd[serial, cms, parallel, epsilon]: |-
-      screen -dm bash -c 'sleep 120; while true; do a="app"; j=".jar"; /usr/java/latest/bin/jcmd $(pgrep -f $a$j | tail -n1) GC.run &>> /var/log/run.log; sleep 20; done;'  
+      screen -dm bash -c 'sleep 300; while true; do a="app"; j=".jar"; /usr/java/latest/bin/jcmd $(pgrep -f $a$j | tail -n1) GC.run &>> /var/log/run.log; sleep 20; done;'  
 
 #  OpenJ9 memory usage should be tracked in a tricky way 
-#      while true; do
-#        ps -orss --no-headers --pid $(pgrep -f java | tail -n1) 
-#        sleep 1
-#      done
+#  while true; do used=$(ps -orss --no-headers --pid $(pgrep -f java | tail -n1)); echo "scale=2 ; $used / 1024*1024" | bc; sleep 1; done
