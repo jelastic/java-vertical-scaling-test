@@ -105,22 +105,22 @@ actions:
        curl ${baseUrl}/deployments/zing.yaml | sed "s/%JAVA_OPTS%/${globals.zing}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | kubectl apply -f -
 
   getPods:
-      - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-zulujdk -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
+      - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-epsilon -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
       - setGlobals:
           zuluPod: ${response.out}
-      - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-adoptopenjdk -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
+      - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-shenandoah -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
       - setGlobals:
           adoptOpenJDKPod: ${response.out}
-      - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-libericajdk -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
+      - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-g1 -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
       - setGlobals:
           libericajdkPod: ${response.out}
       - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-openj9 -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
       - setGlobals:
           openj9Pod: ${response.out}
-      - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-openjdk -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
+      - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-zgc -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
       - setGlobals:
           openjdkPod: ${response.out}
-      - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-zing -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
+      - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-c4 -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
       - setGlobals:
           zingPod: ${response.out}
       - setGlobals:

@@ -57,7 +57,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(container_memory_usage_bytes{container_name=\"java-zing\"})/1024/1024/1024",
+          "expr": "sum(container_memory_usage_bytes{container_name=\"java-c4\"})/1024/1024/1024",
           "legendFormat": "C4",
           "refId": "A"
         },
@@ -67,7 +67,7 @@
           "refId": "B"
         },
         {
-          "expr": "sum(container_memory_usage_bytes{container_name=\"java-openjdk\"})/1024/1024/1024",
+          "expr": "sum(container_memory_usage_bytes{container_name=\"java-zgc\"})/1024/1024/1024",
           "legendFormat": "ZGC",
           "refId": "C"
         },
@@ -77,12 +77,12 @@
           "refId": "D"
         },
         {
-          "expr": "sum(container_memory_usage_bytes{container_name=\"java-libericajdk\"})/1024/1024/1024",
+          "expr": "sum(container_memory_usage_bytes{container_name=\"java-g1\"})/1024/1024/1024",
           "legendFormat": "G1",
           "refId": "E"
         },
         {
-          "expr": "sum(container_memory_usage_bytes{container_name=\"java-adoptopenjdk\"})/1024/1024/1024",
+          "expr": "sum(container_memory_usage_bytes{container_name=\"java-shenandoah\"})/1024/1024/1024",
           "legendFormat": "Shenandoah",
           "refId": "F"
         }
