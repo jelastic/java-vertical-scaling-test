@@ -22,7 +22,7 @@ globals:
   limit: 4Gi
   cloudlets: 40
   common: -Xmx3g -Xms32m -XX:+UseCompressedOops
-  zing: -XX:-AutoTuneResourceDefaultsBasedOnXmx -XX:-UseZST
+  zing: -XX:-AutoTuneResourceDefaultsBasedOnXmx -XX:+UseZST
   openjdk: -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:ZUncommitDelay=1 -XX:ZCollectionInterval=30
   openj9: -XX:+IdleTuningCompactOnIdle -XX:+IdleTuningGcOnIdle -XX:IdleTuningMinIdleWaitTime=1 -Xjit:waitTimeToEnterDeepIdleMode=1000
   adoptopenjdk: -XX:+UnlockExperimentalVMOptions -XX:+UseShenandoahGC -XX:ShenandoahGCHeuristics=compact
