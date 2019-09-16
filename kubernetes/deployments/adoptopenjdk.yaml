@@ -30,4 +30,4 @@ spec:
             value: %JAVA_OPTS%
           command: ["/bin/bash", "-c", "curl -L https://github.com/jelastic/java-vertical-scaling-test/raw/master/dist/app.jar --output app.jar && sleep 3 && %CMD%"]
       nodeSelector:
-        java: adoptjdk
+        gc: Shenandoah

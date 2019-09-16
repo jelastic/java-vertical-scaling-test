@@ -68,7 +68,7 @@
         },
         {
           "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-openjdk\"}[5m])",
-          "legendFormat": "ZG",
+          "legendFormat": "ZGC",
           "refId": "C"
         },
         {
