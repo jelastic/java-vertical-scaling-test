@@ -18,7 +18,7 @@ baseUrl: https://raw.githubusercontent.com/jelastic/java-vertical-scaling-test/m
 
 globals:
   # keep \\\\n for sed replacement!!!
-  cmd: java --uninstall; echo -ne '\\\\n' | java -jar app.jar 30
+  cmd: java --uninstall; echo -ne '\\\\n' | java -jar app.jar 100 2
   limit: 4Gi
   cloudlets: 40
   common: -Xmx3g -Xms32m -XX:+UseCompressedOops
