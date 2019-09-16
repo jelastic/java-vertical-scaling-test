@@ -18,10 +18,18 @@ spec:
         k8s-app: java-zing
         app: java
     spec:
+      volumes:
+      - name: zingmm0
+        hostPath:
+          path: /dev/zing_mm0
       containers:
         - name: java-zing
           image: devbeta/javaengine:zing-11.0.0
           imagePullPolicy: Always
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_TIME", "SYS_RAWIO", "SYS_ADMIN", "ALL"]
           resources:
             limits:
               memory: %MEM_LIMIT%
