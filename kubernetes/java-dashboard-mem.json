@@ -82,7 +82,7 @@
           "refId": "E"
         },
         {
-          "expr": "sum(container_memory_usage_bytes{container_name=\"java-adoptopenjkd\"})/1024/1024/1024",
+          "expr": "sum(container_memory_usage_bytes{container_name=\"java-adoptopenjdk\"})/1024/1024/1024",
           "legendFormat": "Shenandoah",
           "refId": "F"
         }

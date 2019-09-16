@@ -19,7 +19,7 @@ spec:
         app: java
     spec:
       containers:
-        - name: java-adoptopenjkd
+        - name: java-adoptopenjdk
           resources:
             limits:
               memory: %MEM_LIMIT%
