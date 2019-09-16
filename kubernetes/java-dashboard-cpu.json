@@ -57,17 +57,17 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-zing\"}[5m])",
+          "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-c4\"}[5m])",
           "legendFormat": "C4",
           "refId": "A"
         },
         {
-          "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-zulujdk\"}[5m])",
+          "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-epsilon\"}[5m])",
           "legendFormat": "Epsilon",
           "refId": "B"
         },
         {
-          "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-openjdk\"}[5m])",
+          "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-zgc\"}[5m])",
           "legendFormat": "ZGC",
           "refId": "C"
         },
@@ -77,12 +77,12 @@
           "refId": "D"
         },
         {
-          "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-libericajdk\"}[5m])",
+          "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-g1\"}[5m])",
           "legendFormat": "G1",
           "refId": "E"
         },
         {
-          "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-adoptopenjdk\"}[5m])",
+          "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-shenandoah\"}[5m])",
           "legendFormat": "Shenandoah",
           "refId": "F"
         }
