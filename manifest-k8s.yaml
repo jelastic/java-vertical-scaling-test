@@ -18,7 +18,7 @@ baseUrl: https://raw.githubusercontent.com/jelastic/java-vertical-scaling-test/m
 
 globals:
   # keep \\\\n for sed replacement!!!
-  cmd: echo -ne '\\\\n' | java -jar app.jar 30
+  cmd: java --uninstall; echo -ne '\\\\n' | java -jar app.jar 30
   limit: 4Gi
   cloudlets: 40
   common: -Xmx3g -Xms32m -XX:+UseCompressedOops
@@ -92,8 +92,8 @@ actions:
        kubectl create namespace java || true
        kubectl delete deployment --force --grace-period=0 -l=app=java -n java || true
        kubectl delete pods -n java $(kubectl get pods -l=app=java -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}') --force --grace-period=0 || true
-       wget ${baseUrl}/java-dashboard-mem.json
-       wget ${baseUrl}/java-dashboard-cpu.json
+       wget ${baseUrl}/java-dashboard-mem.json -O java-dashboard-mem.json
+       wget ${baseUrl}/java-dashboard-cpu.json -O java-dashboard-cpu.json
        export grafana_secret=$(kubectl get secret --namespace kubernetes-monitoring monitoring-grafana -o jsonpath='{.data.admin-password}' | base64 --decode ; echo)
        curl -s -k -u "admin:${grafana_secret}" -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d @java-dashboard-mem.json  http://${env.domain}/grafana/api/dashboards/db/
        curl -s -k -u "admin:${grafana_secret}" -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d @java-dashboard-cpu.json  http://${env.domain}/grafana/api/dashboards/db/
@@ -133,7 +133,7 @@ actions:
 
               Get logs: `kubectl logs -f $deploymentName -n java`
 
-              [Memory Utilization Dashboard](${env.url}grafana/d/java-mem/java-memory?orgId=1&refresh=5s)
+              [Memory Utilization Dashboard](${env.url}grafana/d/java-mem/java-memory?orgId=1&refresh=5s&from=now-15m&to=now)
 
-              [CPU Utilization Dashboard](${env.url}grafana/d/java-cpu/java-cpu?orgId=1&refresh=5s)
+              [CPU Utilization Dashboard](${env.url}grafana/d/java-cpu/java-cpu?orgId=1&refresh=5s&from=now-15m&to=now)
 success: ${globals.success}
