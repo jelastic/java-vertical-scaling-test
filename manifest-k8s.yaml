@@ -38,49 +38,49 @@ onInstall:
 actions:
   labelNodes:
     - cmd [${nodes.k8sm.master.id}]: curl ${baseUrl}/scripts/labelnodes.sh | bash
-    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=java=zulujdk --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
+    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=gc=Epsilon --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
     - setGlobals:
-        zuluNode: ${response.out}
-    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=java=openjdk --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
+        epsilonNode: ${response.out}
+    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=gc=ZGC --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
     - setGlobals:
-        openjdkNode: ${response.out}
-    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=java=adoptjdk --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
+        zgcNode: ${response.out}
+    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=gc=Shenandoah --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
     - setGlobals:
-        adoptjdkNode: ${response.out}
-    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=java=openj9 --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
+        shenandoahNode: ${response.out}
+    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=gc=OpenJ9 --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
     - setGlobals:
         openj9Node: ${response.out}
-    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=java=liberica --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
+    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=gc=G1 --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
     - setGlobals:
-        libericaNode: ${response.out}
-    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=java=zing --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
+        g1Node: ${response.out}
+    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=gc=C4 --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
     - setGlobals:
-        zingNode: ${response.out}
+        c4Node: ${response.out}
   renameNodes:
      - jelastic.environment.control.SetNodeDisplayName:
           envName: ${env.name}
-          nodeId: ${globals.zuluNode}
-          displayName: zuluJdkNode
+          nodeId: ${globals.epsilonNode}
+          displayName: Epsilon
      - jelastic.environment.control.SetNodeDisplayName:
           envName: ${env.name}
-          nodeId: ${globals.openjdkNode}
-          displayName: openjdkNode
+          nodeId: ${globals.zgcNode}
+          displayName: ZGC
      - jelastic.environment.control.SetNodeDisplayName:
           envName: ${env.name}
-          nodeId: ${globals.adoptjdkNode}
-          displayName: adoptjdkNode
+          nodeId: ${globals.shenandoahNode}
+          displayName: Shenandoah
      - jelastic.environment.control.SetNodeDisplayName:
           envName: ${env.name}
           nodeId: ${globals.openj9Node}
-          displayName: openj9Node
+          displayName: Openj9
      - jelastic.environment.control.SetNodeDisplayName:
           envName: ${env.name}
-          nodeId: ${globals.libericaNode}
-          displayName: libericaNode
+          nodeId: ${globals.g1Node}
+          displayName: G1
      - jelastic.environment.control.SetNodeDisplayName:
           envName: ${env.name}
-          nodeId: ${globals.zingNode}
-          displayName: zingNode
+          nodeId: ${globals.c4Node}
+          displayName: C4
   setCloudlets:
     env.control.SetCloudletsCountByGroup:
       nodeGroup: cp
