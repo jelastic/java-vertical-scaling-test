@@ -57,33 +57,33 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(container_memory_usage_bytes{container_name=\"java-zing\"})/1024/1024/1024",
-          "legendFormat": "Zing",
+          "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-zing\"}[5m])",
+          "legendFormat": "C4",
           "refId": "A"
         },
         {
-          "expr": "sum(container_memory_usage_bytes{container_name=\"java-zulujdk\"})/1024/1024/1024",
-          "legendFormat": "Zulu",
+          "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-zulujdk\"}[5m])",
+          "legendFormat": "Epsilon",
           "refId": "B"
         },
         {
-          "expr": "sum(container_memory_usage_bytes{container_name=\"java-openjdk\"})/1024/1024/1024",
-          "legendFormat": "OpenJDK13",
+          "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-openjdk\"}[5m])",
+          "legendFormat": "ZG",
           "refId": "C"
         },
         {
-          "expr": "sum(container_memory_usage_bytes{container_name=\"java-openj9\"})/1024/1024/1024",
+          "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-openj9\"}[5m])",
           "legendFormat": "OpenJ9",
           "refId": "D"
         },
         {
-          "expr": "sum(container_memory_usage_bytes{container_name=\"java-libericajdk\"})/1024/1024/1024",
-          "legendFormat": "Liberica",
+          "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-libericajdk\"}[5m])",
+          "legendFormat": "G1",
           "refId": "E"
         },
         {
-          "expr": "sum(container_memory_usage_bytes{container_name=\"java-adoptopenjkd\"})/1024/1024/1024",
-          "legendFormat": "AdoptOpenJDK",
+          "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-adoptopenjdk\"}[5m])",
+          "legendFormat": "Shenandoah",
           "refId": "F"
         }
       ],
@@ -136,7 +136,7 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {
@@ -154,8 +154,8 @@
     ]
   },
   "timezone": "",
-  "title": "Java",
-  "uid": "DBy2mU5Zz",
+  "title": "Java CPU",
+  "uid": "java-cpu",
   "version": 2
 },
   "folderId": 0,
