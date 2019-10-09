@@ -3,7 +3,7 @@
   <display-name>JSP Example</display-name>
     <session-config>
         <session-timeout>
-            30
+            1
         </session-timeout>
     </session-config>
 </web-app>
