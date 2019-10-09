@@ -1,3 +1,4 @@
+
 type: install
 id: java-memory-usage-demo
 name: Java Vertical Scaling
@@ -6,6 +7,7 @@ homepage: https://github.com/jelastic/java-vertical-scaling-test
 logo: /images/elastic-duke-70x70.png
 description: |
   Java vertical scaling test:
+  * Shenandoah 
   * G1
   * ZGC @ Oracle OpenJDK
   * Serial
@@ -16,6 +18,14 @@ globals:
   cloudlets: 26
   common: -Xmx3g -Xms32m -XX:+UseCompressedOops
 nodes:
+  - nodeType: payara
+    tag: 5.192-openjdk-1.8.0_222
+    nodeGroup: shennan
+    cloudlets: ${globals.cloudlets}
+    displayName: Shenandoah
+    env:
+      GC_DEF: ShenandoahGC
+      _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions -XX:ShenandoahGCHeuristics=compact
   - nodeType: payara
     tag: 5.192-adoptopenjdk-11.0.4
     nodeGroup: zgc
