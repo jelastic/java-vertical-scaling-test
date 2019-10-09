@@ -55,32 +55,32 @@ nodes:
       GC_DEF: EpsilonGC
       _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions
 
-    - nodeType: payara
-      tag: 5.192-zulujdk-11.0.4
-      nodeGroup: epsilon
-      cloudlets: ${globals.cloudlets}
-      displayName: ConcMarkSweep
-      env:
-        GC_DEF: ConcMarkSweepGC
-        _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions
+  - nodeType: payara
+    tag: 5.192-zulujdk-11.0.4
+    nodeGroup: cms
+    cloudlets: ${globals.cloudlets}
+    displayName: ConcMarkSweep
+    env:
+      GC_DEF: ConcMarkSweepGC
+      _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions
 
-    - nodeType: payara
-      tag: 5.192-zulujdk-11.0.4
-      nodeGroup: epsilon
-      cloudlets: ${globals.cloudlets}
-      displayName: Parallel
-      env:
-        GC_DEF: ParallelGC
-        _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions
+  - nodeType: payara
+    tag: 5.192-zulujdk-11.0.4
+    nodeGroup: parallel
+    cloudlets: ${globals.cloudlets}
+    displayName: Parallel
+    env:
+      GC_DEF: ParallelGC
+      _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions
 
-    - nodeType: payara
-      tag: 5.192-zulujdk-11.0.4
-      nodeGroup: epsilon
-      cloudlets: ${globals.cloudlets}
-      displayName: Serial
-      env:
-        GC_DEF: SerialGC
-        _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions
+  - nodeType: payara
+    tag: 5.192-zulujdk-11.0.4
+    nodeGroup: serial
+    cloudlets: ${globals.cloudlets}
+    displayName: Serial
+    env:
+      GC_DEF: SerialGC
+      _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions
 
 onInstall:
  - deploy
@@ -93,4 +93,3 @@ actions:
         context : ROOT
         fileName: ROOT.war
         fileUrl : https://github.com/jelastic/java-vertical-scaling-test/raw/payara/webapp/target/ROOT.war
-        delay: 30
