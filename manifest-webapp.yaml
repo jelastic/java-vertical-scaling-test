@@ -1,4 +1,3 @@
-
 type: install
 id: java-memory-usage-demo
 name: Java Vertical Scaling
@@ -8,10 +7,7 @@ logo: /images/elastic-duke-70x70.png
 description: |
   Java vertical scaling test:
   * G1
-  * Shenandoah
   * ZGC @ Oracle OpenJDK
-  * C4 @ Zing
-  * OpenJ9
   * Serial
   * CMS
   * Epsilon
@@ -20,27 +16,61 @@ globals:
   cloudlets: 26
   common: -Xmx3g -Xms32m -XX:+UseCompressedOops
 nodes:
-# Shenandoah isn't supported in zulujdk-11.0.4
-# Unrecognized VM option 'UseShenandoahGC'
-  # - nodeType: payara
-  #   tag: 5.192-zulujdk-11.0.4
-  #   nodeGroup: shenan
-  #   cloudlets: ${globals.cloudlets}
-  #   displayName: Shenandoah
-  #   env:
-  #     GC_DEF: ShenandoahGC
-  #     _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions -XX:ShenandoahGCHeuristics=compact
-
   - nodeType: payara
     tag: 5.192-adoptopenjdk-11.0.4
     nodeGroup: zgc
     cloudlets: ${globals.cloudlets}
     displayName: ZGC @ Oracle OpenJDK
-    #-XX:ZUncommitDelay=1 -XX:ZCollectionInterval=30 is very aggressive mode as well, similar to Shenandoah
     # -XX:ZUncommitDelay=1 isn't supported in adoptopenjdk-11.0.4
     env:
       GC_DEF: ZGC
       _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions -XX:ZCollectionInterval=30
+
+  - nodeType: payara
+    tag: 5.192-zulujdk-11.0.4
+    nodeGroup: g1
+    cloudlets: ${globals.cloudlets}
+    displayName: G1
+    # -XX:G1PeriodicGCInterval=1k isn't supportred
+    env:
+      GC_DEF: G1GC
+      _JAVA_OPTIONS: ${globals.common}
+
+  - nodeType: payara
+    tag: 5.192-zulujdk-11.0.4
+    nodeGroup: epsilon
+    cloudlets: ${globals.cloudlets}
+    displayName: Epsilon
+    env:
+      GC_DEF: EpsilonGC
+      _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions
+
+    - nodeType: payara
+      tag: 5.192-zulujdk-11.0.4
+      nodeGroup: epsilon
+      cloudlets: ${globals.cloudlets}
+      displayName: ConcMarkSweep
+      env:
+        GC_DEF: ConcMarkSweepGC
+        _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions
+
+    - nodeType: payara
+      tag: 5.192-zulujdk-11.0.4
+      nodeGroup: epsilon
+      cloudlets: ${globals.cloudlets}
+      displayName: Parallel
+      env:
+        GC_DEF: ParallelGC
+        _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions
+
+    - nodeType: payara
+      tag: 5.192-zulujdk-11.0.4
+      nodeGroup: epsilon
+      cloudlets: ${globals.cloudlets}
+      displayName: Serial
+      env:
+        GC_DEF: SerialGC
+        _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions
 
 onInstall:
  - deploy
