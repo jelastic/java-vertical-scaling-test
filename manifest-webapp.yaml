@@ -17,7 +17,7 @@ description: |
 globals:
   cloudlets: 26
   common: -Xmx3g -Xms32m -XX:+UseCompressedOops
-  load-seconds: 15
+  curl-count: 100
 nodes:
   - nodeType: payara
     tag: 5.192-openjdk-1.8.0_222
@@ -96,8 +96,9 @@ actions:
         fileName: ROOT.war
         fileUrl : https://github.com/jelastic/java-vertical-scaling-test/raw/payara/webapp/target/ROOT.war
   load:
-    - cmd[*]: |-
-          echo 'seconds=$(date "+%S"); final=`expr $seconds + ${globals.load-seconds}`; while [ $(date "+%S") -ne $final ]; do curl -s localhost:8080; done' > /opt/payara/load.sh
-          chmod +x /opt/payara/load.sh
-          sleep 60
-          for i in {1..60}; do curl -s localhost:8080 > /dev/null; done
+    cmd[*]: |-
+          echo 'seconds=$(date "+%S"); final=`expr $seconds + ${1}`; while [ $(date "+%S") -ne $final ]; do curl -s localhost:8080 > /dev/null; done' > /usr/bin/load
+          chmod +x /usr/bin/load
+          chmod 777 /usr/bin/load
+          for i in {1..${settings.curl-count}}; do curl -s localhost:8080 > /dev/null; done
+    user: root
