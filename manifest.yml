@@ -6,7 +6,8 @@ homepage: https://github.com/jelastic/java-vertical-scaling-test
 logo: /images/elastic-duke-70x70.png
 description: |
   Java vertical scaling test: 
-  * G1 
+  * G1 @ Zulu 12.0.2
+  * G1 @ Dragonwell 8.1.1
   * Shenandoah
   * ZGC @ Oracle OpenJDK
   * C4 @ Zing
@@ -20,6 +21,23 @@ globals:
   cloudlets: 26
   common: -Xmx3g -Xms32m -XX:+UseCompressedOops
 nodes:
+  - nodeType: javaengine
+    tag: zulujdk-12.0.2
+    nodeGroup: g1
+    cloudlets: ${globals.cloudlets}
+    displayName: G1 @ Zulu 12
+    startService: false
+    env:
+      _JAVA_OPTIONS: ${globals.common} -XX:+UseG1GC -XX:G1PeriodicGCInterval=1k
+
+  - image: devbeta/javaengine:dragonwell-8.1.1
+    nodeGroup: dw
+    cloudlets: ${globals.cloudlets}
+    displayName: G1 @ Dragonwell 8
+    startService: false
+    env:
+      _JAVA_OPTIONS: -Xmx3g -Xms3g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=1000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10
+      
   - nodeType: javaengine
     tag: zulujdk-12.0.2
     nodeGroup: shenan
@@ -39,15 +57,6 @@ nodes:
     env:
       _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:ZUncommitDelay=1 -XX:ZCollectionInterval=30
       
-  - nodeType: javaengine
-    tag: zulujdk-12.0.2
-    nodeGroup: g1
-    cloudlets: ${globals.cloudlets}
-    displayName: G1
-    startService: false
-    env:
-      _JAVA_OPTIONS: ${globals.common} -XX:+UseG1GC -XX:G1PeriodicGCInterval=1k
-
   - nodeType: javaengine
     tag: zulujdk-12.0.2
     nodeGroup: epsilon
