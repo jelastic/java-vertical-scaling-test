@@ -9,15 +9,14 @@ description: |
   Java vertical scaling test:
   * Shenandoah
   * G1
-  * ZGC @ Oracle OpenJDK
+  * G1 @Dragonwell
   * Serial
   * CMS
-  * Epsilon
   * Parallel
 globals:
   cloudlets: 26
   common: -Xmx3g -Xms32m -XX:+UseCompressedOops
-  curl-count: 100
+  curl-count: 1500
 nodes:
   - nodeType: payara
     tag: 5.192-openjdk-1.8.0_222
@@ -27,15 +26,6 @@ nodes:
     env:
       GC_DEF: ShenandoahGC
       _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions -XX:ShenandoahGCHeuristics=compact
-  - nodeType: payara
-    tag: 5.192-adoptopenjdk-11.0.4
-    nodeGroup: zgc
-    cloudlets: ${globals.cloudlets}
-    displayName: ZGC @ Oracle OpenJDK
-    # -XX:ZUncommitDelay=1 isn't supported in adoptopenjdk-11.0.4
-    env:
-      GC_DEF: ZGC
-      _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions -XX:ZCollectionInterval=30
 
   - nodeType: payara
     tag: 5.192-zulujdk-11.0.4
@@ -47,14 +37,14 @@ nodes:
       GC_DEF: G1GC
       _JAVA_OPTIONS: ${globals.common}
 
-  - nodeType: payara
-    tag: 5.192-zulujdk-11.0.4
-    nodeGroup: epsilon
-    cloudlets: ${globals.cloudlets}
-    displayName: Epsilon
-    env:
-      GC_DEF: EpsilonGC
-      _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions
+  # - nodeType: payara
+  #   tag: 5.192-dragonwell-8.1.1
+  #   nodeGroup: dragonwell-g1
+  #   cloudlets: ${globals.cloudlets}
+  #   displayName: DragonWell
+  #   env:
+  #     GC_DEF: G1GC
+  #     _JAVA_OPTIONS: ${globals.common} -Xms3g -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=300000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10
 
   - nodeType: payara
     tag: 5.192-zulujdk-11.0.4
@@ -100,5 +90,14 @@ actions:
           echo 'seconds=$(date "+%S"); final=`expr $seconds + ${1}`; while [ $(date "+%S") -ne $final ]; do curl -s localhost:8080 > /dev/null; done' > /usr/bin/load
           chmod +x /usr/bin/load
           chmod 777 /usr/bin/load
-          for i in {1..${settings.curl-count}}; do curl -s localhost:8080 > /dev/null; done
+    cmd[shennan]: |-
+        for i in {1..1000}; do curl -s localhost:8080 > /dev/null; done
+    cmd[g1]: |-
+        for i in {1..1000}; do curl -s localhost:8080 > /dev/null; done
+    cmd[parallel]: |-
+        for i in {1..1000}; do curl -s localhost:8080 > /dev/null; done
+    cmd[cms]: |-
+        for i in {1..600}; do curl -s localhost:8080 > /dev/null; done
+    cmd[serial]: |-
+        for i in {1..600}; do curl -s localhost:8080 > /dev/null; done
     user: root
