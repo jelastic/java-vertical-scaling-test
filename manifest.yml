@@ -55,7 +55,7 @@ nodes:
     startService: false
     #-XX:ZUncommitDelay=1 -XX:ZCollectionInterval=30 is very agressive mode as well, similar to Shenandoah
     env:
-      _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:ZUncommitDelay=1 -XX:ZCollectionInterval=30
+      _JAVA_OPTIONS: ${globals.common} -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:ZUncommitDelay=30 -XX:ZCollectionInterval=60
       
   - nodeType: javaengine
     tag: zulujdk-12.0.2
