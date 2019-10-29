@@ -14,9 +14,8 @@ description: |
   * CMS
   * Parallel
 globals:
-  cloudlets: 26
-  common: -Xmx3g -Xms32m -XX:+UseCompressedOops
-  curl-count: 1500
+  cloudlets: 32
+  common: -Xmx4g -Xms32m -XX:+UseCompressedOops
 nodes:
   - nodeType: payara
     tag: 5.192-openjdk-1.8.0_222
@@ -44,8 +43,7 @@ nodes:
     displayName: DragonWell
     env:
       GC_DEF: G1GC
-      _JAVA_OPTIONS: ${globals.common} -Xms3g -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=300000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10
-
+      _JAVA_OPTIONS: ${globals.common} -Xms4g -XX:+UseCompressedOops -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=300000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10
   - nodeType: payara
     tag: 5.192-zulujdk-11.0.4
     nodeGroup: cms
@@ -90,16 +88,5 @@ actions:
           echo 'seconds=$(date "+%S"); final=`expr $seconds + ${1}`; while [ $(date "+%S") -ne $final ]; do curl -s localhost:8080 > /dev/null; done' > /usr/bin/load
           chmod +x /usr/bin/load
           chmod 777 /usr/bin/load
-    cmd[dragonwell-g1]: |-
-        for i in {1..1000}; do curl -s localhost:8080 > /dev/null; done
-    cmd[shennan]: |-
-        for i in {1..1000}; do curl -s localhost:8080 > /dev/null; done
-    cmd[g1]: |-
-        for i in {1..1000}; do curl -s localhost:8080 > /dev/null; done
-    cmd[parallel]: |-
-        for i in {1..1000}; do curl -s localhost:8080 > /dev/null; done
-    cmd[cms]: |-
-        for i in {1..600}; do curl -s localhost:8080 > /dev/null; done
-    cmd[serial]: |-
-        for i in {1..600}; do curl -s localhost:8080 > /dev/null; done
+          for i in {1..700}; do curl -s localhost:8080 > /dev/null; done
     user: root
