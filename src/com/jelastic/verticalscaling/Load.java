@@ -12,7 +12,7 @@ public class Load {
 
     private int sleep = 0;
     private int longSleep = 60000;
-    private int numCycles = 10;
+    private int numCycles = 3;
     private int mode = 1;
 
     public Load(int sleep) {
