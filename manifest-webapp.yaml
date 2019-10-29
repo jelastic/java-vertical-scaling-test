@@ -37,14 +37,14 @@ nodes:
       GC_DEF: G1GC
       _JAVA_OPTIONS: ${globals.common}
 
-  # - nodeType: payara
-  #   tag: 5.192-dragonwell-8.1.1
-  #   nodeGroup: dragonwell-g1
-  #   cloudlets: ${globals.cloudlets}
-  #   displayName: DragonWell
-  #   env:
-  #     GC_DEF: G1GC
-  #     _JAVA_OPTIONS: ${globals.common} -Xms3g -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=300000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10
+  - nodeType: payara
+    tag: 5.192-dragonwell-8.1.1
+    nodeGroup: dragonwell-g1
+    cloudlets: ${globals.cloudlets}
+    displayName: DragonWell
+    env:
+      GC_DEF: G1GC
+      _JAVA_OPTIONS: ${globals.common} -Xms3g -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=300000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10
 
   - nodeType: payara
     tag: 5.192-zulujdk-11.0.4
@@ -90,6 +90,8 @@ actions:
           echo 'seconds=$(date "+%S"); final=`expr $seconds + ${1}`; while [ $(date "+%S") -ne $final ]; do curl -s localhost:8080 > /dev/null; done' > /usr/bin/load
           chmod +x /usr/bin/load
           chmod 777 /usr/bin/load
+    cmd[dragonwell-g1]: |-
+        for i in {1..1000}; do curl -s localhost:8080 > /dev/null; done
     cmd[shennan]: |-
         for i in {1..1000}; do curl -s localhost:8080 > /dev/null; done
     cmd[g1]: |-
