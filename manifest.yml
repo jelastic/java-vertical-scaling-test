@@ -36,7 +36,7 @@ nodes:
     displayName: G1 @ Dragonwell 8
     startService: false
     env:
-      _JAVA_OPTIONS: -Xmx3g -Xms3g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=1000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10
+      _JAVA_OPTIONS: -Xmx3g -Xms3g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=300000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10
       
   - nodeType: javaengine
     tag: zulujdk-12.0.2
