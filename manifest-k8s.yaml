@@ -3,6 +3,7 @@ description: |
     Java vertical scaling test on Kubernetes:
     * G1
     * Shenandoah
+    * G1 @ Dragonwell 8.1.1
     * ZGC @ Oracle OpenJDK
     * C4 @ Zing
     * OpenJ9
@@ -21,13 +22,14 @@ globals:
   cmd: java --uninstall; echo -ne '\\\\n' | java -jar app.jar 100 2
   limit: 4Gi
   cloudlets: 40
-  common: -Xmx3g -Xms32m -XX:+UseCompressedOops
+  common: -Xmx4g -Xms32m -XX:+UseCompressedOops
   zing: -Xmx500m -Xms32m -XX:+UseCompressedOops-XX:+UseZST
   openjdk: -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:ZUncommitDelay=1 -XX:ZCollectionInterval=30
   openj9: -XX:+IdleTuningCompactOnIdle -XX:+IdleTuningGcOnIdle -XX:IdleTuningMinIdleWaitTime=1 -Xjit:waitTimeToEnterDeepIdleMode=1000
   adoptopenjdk: -XX:+UnlockExperimentalVMOptions -XX:+UseShenandoahGC -XX:ShenandoahGCHeuristics=compact
   liberica: -XX:+UseG1GC -XX:G1PeriodicGCInterval=10k
   zulujdk: -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC
+  dragonwell: -Xms4g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=300000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10
 
 onInstall:
  - labelNodes
@@ -56,6 +58,9 @@ actions:
     - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=gc=C4 --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
     - setGlobals:
         c4Node: ${response.out}
+    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=gc=G1-dragon --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
+    - setGlobals:
+        dragonNode: ${response.out}
   renameNodes:
      - jelastic.environment.control.SetNodeDisplayName:
           envName: ${env.name}
@@ -81,6 +86,10 @@ actions:
           envName: ${env.name}
           nodeId: ${globals.c4Node}
           displayName: C4
+     - jelastic.environment.control.SetNodeDisplayName:
+          envName: ${env.name}
+          nodeId: ${globals.dragonNode}
+          displayName: G1-Dragonwell
   setCloudlets:
     env.control.SetCloudletsCountByGroup:
       nodeGroup: cp
@@ -103,6 +112,7 @@ actions:
        curl ${baseUrl}/deployments/openjdk13.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.openjdk}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | kubectl apply -f -
        curl ${baseUrl}/deployments/zulujdk.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.zulujdk}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | kubectl apply -f -
        curl ${baseUrl}/deployments/zing.yaml | sed "s/%JAVA_OPTS%/${globals.zing}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | kubectl apply -f -
+       curl ${baseUrl}/deployments/gragonwell.yaml | sed "s/%JAVA_OPTS%/${globals.dragonwell}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | kubectl apply -f -
 
   getPods:
       - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-epsilon -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
@@ -123,6 +133,9 @@ actions:
       - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-c4 -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
       - setGlobals:
           zingPod: ${response.out}
+      - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-g1-dragonwell -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
+      - setGlobals:
+          dragonwell: ${response.out}
       - setGlobals:
           success: |
               Pods have been deployed to namespace java.
