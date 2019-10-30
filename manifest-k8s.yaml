@@ -34,8 +34,8 @@ onInstall:
  - renameNodes
  - setCloudlets
  - deploy
- - getPods
  - monit
+ - getPods
 actions:
   labelNodes:
     - cmd [${nodes.k8sm.master.id}]: curl ${baseUrl}/scripts/labelnodes.sh | bash
