@@ -112,7 +112,7 @@ actions:
        curl ${baseUrl}/deployments/openjdk13.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.openjdk}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | kubectl apply -f -
        curl ${baseUrl}/deployments/zulujdk.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.zulujdk}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | kubectl apply -f -
        curl ${baseUrl}/deployments/zing.yaml | sed "s/%JAVA_OPTS%/${globals.zing}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | kubectl apply -f -
-       curl ${baseUrl}/deployments/gragonwell.yaml | sed "s/%JAVA_OPTS%/${globals.dragonwell}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | kubectl apply -f -
+       curl ${baseUrl}/deployments/dragonwell.yaml | sed "s/%JAVA_OPTS%/${globals.dragonwell}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | kubectl apply -f -
 
   getPods:
       - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-epsilon -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
