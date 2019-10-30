@@ -64,7 +64,7 @@
         {
           "expr": "sum(container_memory_usage_bytes{container_name=\"java-zgc\"})/1024/1024/1024",
           "legendFormat": "ZGC",
-          "refId": "D"
+          "refId": "B"
         },
         {
           "expr": "sum(container_memory_usage_bytes{container_name=\"java-openj9\"})/1024/1024/1024",
