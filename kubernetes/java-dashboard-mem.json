@@ -62,28 +62,28 @@
           "refId": "A"
         },
         {
-          "expr": "sum(container_memory_usage_bytes{container_name=\"java-zulujdk\"})/1024/1024/1024",
-          "legendFormat": "Epsilon",
-          "refId": "B"
-        },
-        {
           "expr": "sum(container_memory_usage_bytes{container_name=\"java-zgc\"})/1024/1024/1024",
           "legendFormat": "ZGC",
-          "refId": "C"
+          "refId": "D"
         },
         {
           "expr": "sum(container_memory_usage_bytes{container_name=\"java-openj9\"})/1024/1024/1024",
           "legendFormat": "OpenJ9",
-          "refId": "D"
+          "refId": "C"
         },
         {
           "expr": "sum(container_memory_usage_bytes{container_name=\"java-g1\"})/1024/1024/1024",
           "legendFormat": "G1",
-          "refId": "E"
+          "refId": "D"
         },
         {
           "expr": "sum(container_memory_usage_bytes{container_name=\"java-shenandoah\"})/1024/1024/1024",
           "legendFormat": "Shenandoah",
+          "refId": "E"
+        },
+        {
+          "expr": "sum(container_memory_usage_bytes{container_name=\"java-g1-dragonwell\"})/1024/1024/1024",
+          "legendFormat": "Dragonwell",
           "refId": "F"
         }
       ],

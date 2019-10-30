@@ -62,28 +62,28 @@
           "refId": "A"
         },
         {
-          "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-zulujdk\"}[5m])",
-          "legendFormat": "Epsilon",
-          "refId": "B"
-        },
-        {
           "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-zgc\"}[5m])",
           "legendFormat": "ZGC",
-          "refId": "C"
+          "refId": "B"
         },
         {
           "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-openj9\"}[5m])",
           "legendFormat": "OpenJ9",
-          "refId": "D"
+          "refId": "C"
         },
         {
           "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-g1\"}[5m])",
           "legendFormat": "G1",
-          "refId": "E"
+          "refId": "D"
         },
         {
           "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-shenandoah\"}[5m])",
           "legendFormat": "Shenandoah",
+          "refId": "E"
+        },
+        {
+          "expr": "rate(container_cpu_usage_seconds_total{container_name=\"java-g1-dragonwell\"}[5m])",
+          "legendFormat": "Dragonwell",
           "refId": "F"
         }
       ],

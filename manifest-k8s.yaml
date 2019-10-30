@@ -7,7 +7,6 @@ description: |
     * ZGC @ Oracle OpenJDK
     * C4 @ Zing
     * OpenJ9
-    * Epsilon
 
     **Important!** Apply this Add-On to a Kubernetes Cluster with **6** worker nodes.
     Each pod is deployed to its dedicated labeled node to easily track memory utilization.
@@ -23,13 +22,12 @@ globals:
   limit: 4Gi
   cloudlets: 40
   common: -Xmx4g -Xms32m -XX:+UseCompressedOops
-  zing: -Xmx500m -Xms32m -XX:+UseCompressedOops-XX:+UseZST
+  zing: -Xmx500m -Xms32m -XX:+UseCompressedOops -XX:+UseZST
   openjdk: -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:ZUncommitDelay=1 -XX:ZCollectionInterval=30
   openj9: -XX:+IdleTuningCompactOnIdle -XX:+IdleTuningGcOnIdle -XX:IdleTuningMinIdleWaitTime=1 -Xjit:waitTimeToEnterDeepIdleMode=1000
   adoptopenjdk: -XX:+UnlockExperimentalVMOptions -XX:+UseShenandoahGC -XX:ShenandoahGCHeuristics=compact
   liberica: -XX:+UseG1GC -XX:G1PeriodicGCInterval=10k
-  zulujdk: -XX:+UnlockExperimentalVMOptions -XX:+UseEpsilonGC
-  dragonwell: -Xms4g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=300000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10
+  dragonwell: -Xmx4g -Xms4g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=300000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10
 
 onInstall:
  - labelNodes
@@ -37,12 +35,10 @@ onInstall:
  - setCloudlets
  - deploy
  - getPods
+ - monit
 actions:
   labelNodes:
     - cmd [${nodes.k8sm.master.id}]: curl ${baseUrl}/scripts/labelnodes.sh | bash
-    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=gc=Epsilon --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
-    - setGlobals:
-        epsilonNode: ${response.out}
     - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=gc=ZGC --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
     - setGlobals:
         zgcNode: ${response.out}
@@ -62,10 +58,6 @@ actions:
     - setGlobals:
         dragonNode: ${response.out}
   renameNodes:
-     - jelastic.environment.control.SetNodeDisplayName:
-          envName: ${env.name}
-          nodeId: ${globals.epsilonNode}
-          displayName: Epsilon
      - jelastic.environment.control.SetNodeDisplayName:
           envName: ${env.name}
           nodeId: ${globals.zgcNode}
@@ -113,11 +105,11 @@ actions:
        curl ${baseUrl}/deployments/zulujdk.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.zulujdk}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | kubectl apply -f -
        curl ${baseUrl}/deployments/zing.yaml | sed "s/%JAVA_OPTS%/${globals.zing}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | kubectl apply -f -
        curl ${baseUrl}/deployments/dragonwell.yaml | sed "s/%JAVA_OPTS%/${globals.dragonwell}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | kubectl apply -f -
-
+  monit:
+    - cmd[${nodes.k8sm.master.id}]: kubectl get secret --namespace kubernetes-monitoring monitoring-grafana -o jsonpath='{.data.admin-password}' | base64 --decode
+    - setGlobals:
+        monit_token: ${response.out}
   getPods:
-      - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-epsilon -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
-      - setGlobals:
-          zuluPod: ${response.out}
       - cmd[${nodes.k8sm.master.id}]: kubectl get pods -l=k8s-app=java-shenandoah -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}'
       - setGlobals:
           adoptOpenJDKPod: ${response.out}
@@ -149,4 +141,7 @@ actions:
               [Memory Utilization Dashboard](${env.url}grafana/d/java-mem/java-memory?orgId=1&refresh=5s&from=now-5m&to=now)
 
               [CPU Utilization Dashboard](${env.url}grafana/d/java-cpu/java-cpu?orgId=1&refresh=5s&from=now-5m&to=now)
+
+              Login: admin/${globals.monit_token}
+
 success: ${globals.success}
