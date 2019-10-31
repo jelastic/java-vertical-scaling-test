@@ -23,7 +23,7 @@ globals:
   cloudlets: 40
   common: -Xmx3g -Xms32m -XX:+UseCompressedOops
   zing: -Xmx500m -Xms32m -XX:+UseCompressedOops -XX:+UseZST
-  openjdk: -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:ZUncommitDelay=1 -XX:ZCollectionInterval=30
+  openjdk: -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:ZUncommitDelay=30 -XX:ZCollectionInterval=60
   openj9: -XX:+IdleTuningCompactOnIdle -XX:+IdleTuningGcOnIdle -XX:IdleTuningMinIdleWaitTime=1 -Xjit:waitTimeToEnterDeepIdleMode=1000
   adoptopenjdk: -XX:+UnlockExperimentalVMOptions -XX:+UseShenandoahGC -XX:ShenandoahGCHeuristics=compact
   liberica: -XX:+UseG1GC -XX:G1PeriodicGCInterval=10k
