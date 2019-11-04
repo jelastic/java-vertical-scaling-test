@@ -1,0 +1,106 @@
+type: update
+description: |
+    Java vertical scaling test on Kubernetes: ZGC @ Oracle OpenJDK
+
+    **Important!** Apply this Add-On to a Kubernetes Cluster with **4** worker nodes.
+    Each pod is deployed to its dedicated labeled node to easily track memory utilization.
+
+
+name: Java Vertical Scaling on Kubernetes
+logo: https://github.com/jelastic/java-vertical-scaling-test/raw/master/kubernetes/images/kube.png
+baseUrl: https://raw.githubusercontent.com/jelastic/java-vertical-scaling-test/master/kubernetes
+
+globals:
+  # keep \\\\n for sed replacement!!!
+  cmd: java --uninstall; echo -ne '\\\\n' | java -jar app.jar 100 2
+  limit: 3Gi
+  cloudlets: 40
+  common: -Xmx3g -Xms32m -XX:+UseCompressedOops
+  one: -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:ZUncommitDelay=1 -XX:ZCollectionInterval=30
+  two: -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:ZUncommitDelay=30 -XX:ZCollectionInterval=60
+  three: -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:ZUncommitDelay=60 -XX:ZCollectionInterval=30
+  four: -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:ZUncommitDelay=30 -XX:ZCollectionInterval=1
+
+onInstall:
+ - labelNodes
+ - renameNodes
+ - setCloudlets
+ - deploy
+ - monit
+actions:
+  labelNodes:
+    - cmd [${nodes.k8sm.master.id}]: curl ${baseUrl}/scripts/labelnodes-zgc.sh | bash
+    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=opts=delay1-int30 --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
+    - setGlobals:
+        delay1-int30: ${response.out}
+    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=opts=delay30-int60 --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
+    - setGlobals:
+        delay30-int60: ${response.out}
+    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=opts=delay60-int30 --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
+    - setGlobals:
+        delay60-int30: ${response.out}
+    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=opts=delay30-int1 --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
+    - setGlobals:
+        delay30-int1: ${response.out}
+  renameNodes:
+     - jelastic.environment.control.SetNodeDisplayName:
+          envName: ${env.name}
+          nodeId: ${globals.delay1-int30}
+          displayName: Delay 1 Interval 30
+     - jelastic.environment.control.SetNodeDisplayName:
+          envName: ${env.name}
+          nodeId: ${globals.delay30-int60}
+          displayName: Delay 30 Interval 60
+     - jelastic.environment.control.SetNodeDisplayName:
+          envName: ${env.name}
+          nodeId: ${globals.delay60-int30}
+          displayName: Delay 60 Interval 30
+     - jelastic.environment.control.SetNodeDisplayName:
+          envName: ${env.name}
+          nodeId: ${globals.delay30-int1}
+          displayName: Delay 30 Interval 1
+
+  setCloudlets:
+    env.control.SetCloudletsCountByGroup:
+      nodeGroup: cp
+      fixedCloudlets: 1
+      flexibleCloudlets: ${globals.cloudlets}
+
+  deploy:
+    - cmd [${nodes.k8sm.master.id}]: |-
+       kubectl create namespace java || true
+       kubectl delete deployment --force --grace-period=0 -l=app=java -n java || true
+       kubectl delete pods -n java $(kubectl get pods -l=app=java -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}') --force --grace-period=0 || true
+       wget ${baseUrl}/java-dashboard-mem.json -O java-dashboard-zgc-mem.json
+       wget ${baseUrl}/java-dashboard-cpu.json -O java-dashboard-zgc-cpu.json
+       export grafana_secret=$(kubectl get secret --namespace kubernetes-monitoring monitoring-grafana -o jsonpath='{.data.admin-password}' | base64 --decode ; echo)
+       curl -s -k -u "admin:${grafana_secret}" -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d @java-dashboard-zgc-mem.json  http://${env.domain}/grafana/api/dashboards/db/
+       curl -s -k -u "admin:${grafana_secret}" -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d @java-dashboard-zgc-cpu.json  http://${env.domain}/grafana/api/dashboards/db/
+       curl ${baseUrl}/deployments/openjdk-13.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.openjdk}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | sed "s/%NAME%/delay1-int30/g" | sed "s/%NODE%/delay1-int30/g"  | kubectl apply -f -
+       curl ${baseUrl}/deployments/openjdk-13.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.openjdk}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | sed "s/%NAME%/delay30-int60/g" | sed "s/%NODE%/delay30-int60/g"  | kubectl apply -f -
+       curl ${baseUrl}/deployments/openjdk-13.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.openjdk}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | sed "s/%NAME%/delay60-int30/g" | sed "s/%NODE%/delay60-int30/g"  | kubectl apply -f -
+       curl ${baseUrl}/deployments/openjdk-13.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.openjdk}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | sed "s/%NAME%/delay30-int1/g" | sed "s/%NODE%/delay30-int1/g"  | kubectl apply -f -
+
+
+
+  monit:
+    - cmd[${nodes.k8sm.master.id}]: kubectl get secret --namespace kubernetes-monitoring monitoring-grafana -o jsonpath='{.data.admin-password}' | base64 --decode
+    - setGlobals:
+        monit_token: ${response.out}
+    - setGlobals:
+        success: |
+            Pods have been deployed to namespace java.
+
+            Get pods: `kubectl get pods -n java`
+
+            Get deployments: `kubectl get deployments -n java`
+
+            Get logs: `kubectl logs -f $deploymentName -n java`
+
+            [Memory Utilization Dashboard](${env.url}grafana/d/java-mem/java-memory?orgId=1&refresh=5s&from=now-5m&to=now)
+
+            [CPU Utilization Dashboard](${env.url}grafana/d/java-cpu/java-cpu?orgId=1&refresh=5s&from=now-5m&to=now)
+
+            Login: admin : ${globals.monit_token}
+
+success: ${globals.success}
