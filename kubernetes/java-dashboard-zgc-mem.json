@@ -58,22 +58,22 @@
       "targets": [
         {
           "expr": "sum(container_memory_usage_bytes{container_name=\"java-zgc-delay1-int30\"})/1024/1024/1024",
-          "legendFormat": "C4",
+          "legendFormat": "java-zgc-delay1-int30",
           "refId": "A"
         },
         {
           "expr": "sum(container_memory_usage_bytes{container_name=\"java-zgc-delay30-int60\"})/1024/1024/1024",
-          "legendFormat": "ZGC",
+          "legendFormat": "java-zgc-delay30-int60",
           "refId": "B"
         },
         {
           "expr": "sum(container_memory_usage_bytes{container_name=\"java-zgc-delay60-int30\"})/1024/1024/1024",
-          "legendFormat": "OpenJ9",
+          "legendFormat": "java-zgc-delay60-int30",
           "refId": "C"
         },
         {
           "expr": "sum(container_memory_usage_bytes{container_name=\"java-zgc-delay30-int1\"})/1024/1024/1024",
-          "legendFormat": "G1",
+          "legendFormat": "java-zgc-delay30-int1",
           "refId": "D"
         }
       ],
