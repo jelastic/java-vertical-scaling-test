@@ -1,0 +1,33 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  labels:
+    k8s-app: java-%NAME%
+    app: java
+  name: java-%NAME%
+  namespace: java
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: java-%NAME%
+  template:
+    metadata:
+      labels:
+        k8s-app: java-%NAME%
+        app: java
+    spec:
+      containers:
+        - name: java-%NAME%
+          resources:
+            limits:
+              memory: %MEM_LIMIT%
+          image: %IMAGE%
+          imagePullPolicy: Always
+          env:
+          - name: _JAVA_OPTIONS
+            value: %JAVA_OPTS%
+          command: ["/bin/bash", "-c", "curl -L https://github.com/jelastic/java-vertical-scaling-test/raw/master/dist/app.jar --output app.jar && sleep 3 && %CMD%"]
+      nodeSelector:
+        opts: %NODE%
