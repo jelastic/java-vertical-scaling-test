@@ -145,7 +145,7 @@
   },
   "timezone": "",
   "title": "Java CPU %NAME%",
-  "uid": "java-cpu %NAME%",
+  "uid": "java-cpu-%NAME%",
   "version": 2
 },
   "folderId": 0,
