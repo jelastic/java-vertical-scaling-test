@@ -57,23 +57,23 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(container_memory_usage_bytes{container_name=\"java-zgc-delay1-int30\"})/1024/1024/1024",
-          "legendFormat": "java-zgc-delay1-int30",
+          "expr": "sum(container_memory_usage_bytes{container_name=\"%CONTAINER1%\"})/1024/1024/1024",
+          "legendFormat": "%CONTAINER1%",
           "refId": "A"
         },
         {
-          "expr": "sum(container_memory_usage_bytes{container_name=\"java-zgc-delay30-int60\"})/1024/1024/1024",
-          "legendFormat": "java-zgc-delay30-int60",
+          "expr": "sum(container_memory_usage_bytes{container_name=\"%CONTAINER2%\"})/1024/1024/1024",
+          "legendFormat": "%CONTAINER2%",
           "refId": "B"
         },
         {
-          "expr": "sum(container_memory_usage_bytes{container_name=\"java-zgc-delay60-int30\"})/1024/1024/1024",
-          "legendFormat": "java-zgc-delay60-int30",
+          "expr": "sum(container_memory_usage_bytes{container_name=\"%CONTAINER3%\"})/1024/1024/1024",
+          "legendFormat": "%CONTAINER3%",
           "refId": "C"
         },
         {
-          "expr": "sum(container_memory_usage_bytes{container_name=\"java-zgc-delay30-int1\"})/1024/1024/1024",
-          "legendFormat": "java-zgc-delay30-int1",
+          "expr": "sum(container_memory_usage_bytes{container_name=\"%CONTAINER4%\"})/1024/1024/1024",
+          "legendFormat": "%CONTAINER4%",
           "refId": "D"
         }
       ],
