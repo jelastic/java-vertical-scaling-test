@@ -144,8 +144,8 @@
     ]
   },
   "timezone": "",
-  "title": "Java Memory",
-  "uid": "java-mem",
+  "title": "Java Memory %NAME%",
+  "uid": "java-mem-%NAME%",
   "version": 2
 },
   "folderId": 0,

@@ -1,6 +1,6 @@
 type: update
 description: |
-    Java vertical scaling test on Kubernetes: ZGC @ Oracle OpenJDK
+    Java vertical scaling test on Kubernetes: OpenJ9
 
     **Important!** Apply this Add-On to a Kubernetes Cluster with **4** worker nodes.
     Each pod is deployed to its dedicated labeled node to easily track memory utilization.
@@ -12,20 +12,20 @@ baseUrl: https://raw.githubusercontent.com/jelastic/java-vertical-scaling-test/m
 
 globals:
   # keep \\\\n for sed replacement!!!
-  name: zgc
-  image: jelastic/javaengine:openjdk-13.ea-b31
+  name: openj9
+  image: jelastic/javaengine:openj9-0.15.1-12.0.2
   cmd: java --uninstall; echo -ne '\\\\n' | java -jar app.jar 100 2
   limit: 3Gi
   cloudlets: 40
-  common: -Xmx3g -Xms32m -XX:+UseCompressedOops -XX:+UseZGC
-  container1: delay1-int30
-  container2: delay30-int60
-  container3: delay60-int30
-  container4: delay30-int1
-  opts-container1: -XX:+UnlockExperimentalVMOptions -XX:ZUncommitDelay=1 -XX:ZCollectionInterval=30
-  opts-container2: -XX:+UnlockExperimentalVMOptions -XX:ZUncommitDelay=30 -XX:ZCollectionInterval=60
-  opts-container3: -XX:+UnlockExperimentalVMOptions -XX:ZUncommitDelay=60 -XX:ZCollectionInterval=30
-  opts-container4: -XX:+UnlockExperimentalVMOptions -XX:ZUncommitDelay=30 -XX:ZCollectionInterval=1
+  common: -Xmx3g -Xms32m -XX:+UseCompressedOops
+  container1: option1
+  container2: option2
+  container3: option3
+  container4: option4
+  opts-container1: -XX:+IdleTuningCompactOnIdle -XX:+IdleTuningGcOnIdle -XX:IdleTuningMinIdleWaitTime=1 -Xjit:waitTimeToEnterDeepIdleMode=1000
+  opts-container2: -XX:+IdleTuningCompactOnIdle -XX:+IdleTuningGcOnIdle -XX:IdleTuningMinIdleWaitTime=1 -Xjit:waitTimeToEnterDeepIdleMode=1000
+  opts-container3: -XX:+IdleTuningCompactOnIdle -XX:+IdleTuningGcOnIdle -XX:IdleTuningMinIdleWaitTime=1 -Xjit:waitTimeToEnterDeepIdleMode=1000
+  opts-container4: -XX:+IdleTuningCompactOnIdle -XX:+IdleTuningGcOnIdle -XX:IdleTuningMinIdleWaitTime=1 -Xjit:waitTimeToEnterDeepIdleMode=1000
 
 onInstall:
  - labelNodes

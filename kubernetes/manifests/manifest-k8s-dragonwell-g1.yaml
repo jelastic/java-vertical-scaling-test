@@ -1,6 +1,6 @@
 type: update
 description: |
-    Java vertical scaling test on Kubernetes: ZGC @ Oracle OpenJDK
+    Java vertical scaling test on Kubernetes: G1 @ Dragonwell 8.1.1
 
     **Important!** Apply this Add-On to a Kubernetes Cluster with **4** worker nodes.
     Each pod is deployed to its dedicated labeled node to easily track memory utilization.
@@ -12,20 +12,20 @@ baseUrl: https://raw.githubusercontent.com/jelastic/java-vertical-scaling-test/m
 
 globals:
   # keep \\\\n for sed replacement!!!
-  name: zgc
-  image: jelastic/javaengine:openjdk-13.ea-b31
+  name: dragonwell
+  image: devbeta/javaengine:dragonwell-8.1.1
   cmd: java --uninstall; echo -ne '\\\\n' | java -jar app.jar 100 2
   limit: 3Gi
   cloudlets: 40
-  common: -Xmx3g -Xms32m -XX:+UseCompressedOops -XX:+UseZGC
-  container1: delay1-int30
-  container2: delay30-int60
-  container3: delay60-int30
-  container4: delay30-int1
-  opts-container1: -XX:+UnlockExperimentalVMOptions -XX:ZUncommitDelay=1 -XX:ZCollectionInterval=30
-  opts-container2: -XX:+UnlockExperimentalVMOptions -XX:ZUncommitDelay=30 -XX:ZCollectionInterval=60
-  opts-container3: -XX:+UnlockExperimentalVMOptions -XX:ZUncommitDelay=60 -XX:ZCollectionInterval=30
-  opts-container4: -XX:+UnlockExperimentalVMOptions -XX:ZUncommitDelay=30 -XX:ZCollectionInterval=1
+  common: -Xmx3g -Xms3g -XX:+UseCompressedOops -XX:+UseG1GC
+  container1: same1
+  container2: same2
+  container3: same3
+  container4: same4
+  opts-container1: -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=300000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10
+  opts-container2: -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=300000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10
+  opts-container3: -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=300000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10
+  opts-container4: -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=300000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10
 
 onInstall:
  - labelNodes
