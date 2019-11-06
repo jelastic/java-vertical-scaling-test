@@ -76,10 +76,10 @@ actions:
        kubectl create namespace java || true
        kubectl delete deployment --force --grace-period=0 -l=app=java -n java || true
        kubectl delete pods -n java $(kubectl get pods -l=app=java -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}') --force --grace-period=0 || true
-       wget ${baseUrl}/java-dashboard-mem.json -O java-dashboard-mem.json
-       wget ${baseUrl}/java-dashboard-cpu.json -O java-dashboard-cpu.json
-       cat java-dashboard-mem.json | sed "s/%CONTAINER1%/${globals.container1}/g" | sed "s/%CONTAINER2%/${globals.container1}/g" | sed "s/%CONTAINER3%/${globals.container1}/g" |sed "s/%CONTAINER4%/${globals.container1}/g" > java-dashboard-mem.json
-       cat java-dashboard-cpu.json | sed "s/%CONTAINER1%/${globals.container1}/g" | sed "s/%CONTAINER2%/${globals.container1}/g" | sed "s/%CONTAINER3%/${globals.container1}/g" |sed "s/%CONTAINER4%/${globals.container1}/g" > java-dashboard-cpu.json
+       wget ${baseUrl}/dashboards/java-dashboard-mem.json -O java-dashboard-mem.json
+       wget ${baseUrl}/dashboards/java-dashboard-cpu.json -O java-dashboard-cpu.json
+       cat java-dashboard-mem.json | sed "s/%CONTAINER1%/${globals.container1}/g" | sed "s/%CONTAINER2%/${globals.container2}/g" | sed "s/%CONTAINER3%/${globals.container3}/g" | sed "s/%CONTAINER4%/${globals.container4}/g" > java-dashboard-mem.json
+       cat java-dashboard-cpu.json | sed "s/%CONTAINER1%/${globals.container1}/g" | sed "s/%CONTAINER2%/${globals.container2}/g" | sed "s/%CONTAINER3%/${globals.container3}/g" |sed "s/%CONTAINER4%/${globals.container4}/g" > java-dashboard-cpu.json
        export grafana_secret=$(kubectl get secret --namespace kubernetes-monitoring monitoring-grafana -o jsonpath='{.data.admin-password}' | base64 --decode ; echo)
        curl -s -k -u "admin:${grafana_secret}" -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d @java-dashboard-mem.json  http://${env.domain}/grafana/api/dashboards/db/
        curl -s -k -u "admin:${grafana_secret}" -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d @java-dashboard-cpu.json  http://${env.domain}/grafana/api/dashboards/db/
