@@ -28,7 +28,7 @@ globals:
   opts-container4: -XX:+IdleTuningCompactOnIdle -XX:+IdleTuningGcOnIdle -XX:IdleTuningMinIdleWaitTime=1 -Xjit:waitTimeToEnterDeepIdleMode=1000
 
 mixins:
- - ${baseUrl}/manifests/actions.jps
+ - manifests/actions.jps
 
 onInstall:
    - labelNodes

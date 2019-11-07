@@ -81,9 +81,9 @@ actions:
 
             Get logs: `kubectl logs -f $deploymentName -n java`
 
-            [Memory Utilization Dashboard](${env.url}grafana/d/java-mem/java-memory-${globals.name}?orgId=1&refresh=5s&from=now-5m&to=now)
+            [Memory Utilization Dashboard](${env.url}grafana/d/java-mem-${globals.name}/java-memory-${globals.name}?orgId=1&refresh=5s&from=now-5m&to=now)
 
-            [CPU Utilization Dashboard](${env.url}grafana/d/java-cpu/java-cpu${globals.name}?orgId=1&refresh=5s&from=now-5m&to=now)
+            [CPU Utilization Dashboard](${env.url}grafana/d/java-cpu-${globals.name}/java-cpu-${globals.name}?orgId=1&refresh=5s&from=now-5m&to=now)
 
             Login: admin : ${globals.monit_token}
 

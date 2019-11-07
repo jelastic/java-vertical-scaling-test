@@ -28,7 +28,7 @@ globals:
   opts-container4: -XX:+UnlockExperimentalVMOptions -XX:ZUncommitDelay=30 -XX:ZCollectionInterval=1
 
 mixins:
- - ${baseUrl}/manifests/actions.jps
+ - manifests/actions.jps
 
 onInstall:
    - labelNodes
