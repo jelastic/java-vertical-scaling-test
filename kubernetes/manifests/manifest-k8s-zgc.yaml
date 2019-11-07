@@ -27,91 +27,13 @@ globals:
   opts-container3: -XX:+UnlockExperimentalVMOptions -XX:ZUncommitDelay=60 -XX:ZCollectionInterval=30
   opts-container4: -XX:+UnlockExperimentalVMOptions -XX:ZUncommitDelay=30 -XX:ZCollectionInterval=1
 
+mixins:
+ - ${baseUrl}/manifests/actions.jps
+
 onInstall:
- - labelNodes
- - renameNodes
- - setCloudlets
- - deploy
- - monit
-actions:
-  labelNodes:
-    - cmd [${nodes.k8sm.master.id}]: curl ${baseUrl}/scripts/label-nodes.sh | bash -s -- opts=${globals.container1} opts=${globals.container2} opts=${globals.container3} opts=${globals.container4}
-    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=opts=${globals.container1} --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
-    - setGlobals:
-        node1: ${response.out}
-    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=opts=${globals.container2} --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
-    - setGlobals:
-        node2: ${response.out}
-    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=opts=${globals.container3} --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
-    - setGlobals:
-        node3: ${response.out}
-    - cmd[${nodes.k8sm.master.id}]: kubectl get node -l=opts=${globals.container4} --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}' | awk -F"-" '{print $1}' | cut -c5-
-    - setGlobals:
-        node4: ${response.out}
-  renameNodes:
-     - jelastic.environment.control.SetNodeDisplayName:
-          envName: ${env.name}
-          nodeId: ${globals.node1}
-          displayName: ${globals.container1}
-     - jelastic.environment.control.SetNodeDisplayName:
-          envName: ${env.name}
-          nodeId: ${globals.node2}
-          displayName: ${globals.container2}
-     - jelastic.environment.control.SetNodeDisplayName:
-          envName: ${env.name}
-          nodeId: ${globals.node3}
-          displayName: ${globals.container3}
-     - jelastic.environment.control.SetNodeDisplayName:
-          envName: ${env.name}
-          nodeId: ${globals.node4}
-          displayName: ${globals.container4}
-
-  setCloudlets:
-    env.control.SetCloudletsCountByGroup:
-      nodeGroup: cp
-      fixedCloudlets: 1
-      flexibleCloudlets: ${globals.cloudlets}
-
-  deploy:
-    - cmd [${nodes.k8sm.master.id}]: |-
-       kubectl create namespace java || true
-       kubectl delete deployment --force --grace-period=0 -l=app=java -n java || true
-       kubectl delete pods -n java $(kubectl get pods -l=app=java -n java --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | awk '{print $1}') --force --grace-period=0 || true
-       wget ${baseUrl}/dashboards/java-dashboard-mem.json -O java-dashboard-mem.json
-       wget ${baseUrl}/dashboards/java-dashboard-cpu.json -O java-dashboard-cpu.json
-
-       cat java-dashboard-mem.json | sed "s/%CONTAINER1%/${globals.container1}/g" | sed "s/%CONTAINER2%/${globals.container2}/g" | sed "s/%CONTAINER3%/${globals.container3}/g" | sed "s/%CONTAINER4%/${globals.container4}/g" | sed "s/%NAME%/${globals.name}/g" > java-dashboard-memory.json
-
-       cat java-dashboard-cpu.json | sed "s/%CONTAINER1%/${globals.container1}/g" | sed "s/%CONTAINER2%/${globals.container2}/g" | sed "s/%CONTAINER3%/${globals.container3}/g" | sed "s/%CONTAINER4%/${globals.container4}/g" | sed "s/%NAME%/${globals.name}/g" > java-dashboard-cpu1.json
-
-       export grafana_secret=$(kubectl get secret --namespace kubernetes-monitoring monitoring-grafana -o jsonpath='{.data.admin-password}' | base64 --decode ; echo)
-       curl -s -k -u "admin:${grafana_secret}" -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d @java-dashboard-memory.json  http://${env.domain}/grafana/api/dashboards/db/
-       curl -s -k -u "admin:${grafana_secret}" -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d @java-dashboard-cpu1.json  http://${env.domain}/grafana/api/dashboards/db/
-       rm java-dashboard-cpu.json  java-dashboard-mem.json || true
-       curl ${baseUrl}/deployments/deployment.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.opts-container1}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | sed "s/%NAME%/${globals.container1}/g" | sed "s/%NODE%/${globals.container1}/g" | sed "s@%IMAGE%@${globals.image}@g" | kubectl apply -f -
-       curl ${baseUrl}/deployments/deployment.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.opts-container2}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | sed "s/%NAME%/${globals.container2}/g" | sed "s/%NODE%/${globals.container2}/g" | sed "s@%IMAGE%@${globals.image}@g" | kubectl apply -f -
-       curl ${baseUrl}/deployments/deployment.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.opts-container3}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | sed "s/%NAME%/${globals.container3}/g" | sed "s/%NODE%/${globals.container3}/g" |sed "s@%IMAGE%@${globals.image}@g" | kubectl apply -f -
-       curl ${baseUrl}/deployments/deployment.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.opts-container4}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | sed "s/%NAME%/${globals.container4}/g" | sed "s/%NODE%/${globals.container4}/g" | sed "s@%IMAGE%@${globals.image}@g" | kubectl apply -f -
-
-
-  monit:
-    - cmd[${nodes.k8sm.master.id}]: kubectl get secret --namespace kubernetes-monitoring monitoring-grafana -o jsonpath='{.data.admin-password}' | base64 --decode
-    - setGlobals:
-        monit_token: ${response.out}
-    - setGlobals:
-        success: |
-            Pods have been deployed to namespace java.
-
-            Get pods: `kubectl get pods -n java`
-
-            Get deployments: `kubectl get deployments -n java`
-
-            Get logs: `kubectl logs -f $deploymentName -n java`
-
-            [Memory Utilization Dashboard](${env.url}grafana/d/java-mem/java-memory-${globals.name}?orgId=1&refresh=5s&from=now-5m&to=now)
-
-            [CPU Utilization Dashboard](${env.url}grafana/d/java-cpu/java-cpu${globals.name}?orgId=1&refresh=5s&from=now-5m&to=now)
-
-            Login: admin : ${globals.monit_token}
-
+   - labelNodes
+   - renameNodes
+   - setCloudlets
+   - deploy
+   - monit
 success: ${globals.success}
