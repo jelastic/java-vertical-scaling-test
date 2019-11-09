@@ -18,15 +18,15 @@ globals:
   limit: 3Gi
   cloudlets: 40
   common: -Xmx3g -Xms3g -XX:+UseCompressedOops -XX:+UseG1GC
-  container1: same1
-  container2: same2
-  container3: same3
-  container4: same4
-  opts-container1: -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=300000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10
-  opts-container2: -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=300000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10
-  opts-container3: -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=300000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10
-  opts-container4: -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=300000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10
-
+  container1: custom1
+  container2: custom2
+  container3: custom3
+  container4: default
+  opts-container1: -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=600000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10 -XX:ElasticHeapPeriodicUncommitStartupDelay=10 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10 -XX:ElasticHeapMinYoungCommitPercent=5
+  opts-container2: -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=30000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=300000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10 -XX:ElasticHeapPeriodicUncommitStartupDelay=10 -XX:ElasticHeapPeriodicMinYoungCommitPercent=30 -XX:ElasticHeapMinYoungCommitPercent=10
+  opts-container3: -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=60000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10 -XX:ElasticHeapPeriodicUncommitStartupDelay=10 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10 -XX:ElasticHeapMinYoungCommitPercent=5
+  opts-container4: -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit
+  
 mixins:
  - manifests/actions.jps
 
