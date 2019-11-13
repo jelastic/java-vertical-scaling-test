@@ -24,10 +24,10 @@ globals:
   common: -Xmx3g -Xms32m -XX:+UseCompressedOops
   zing: -Xmx500m -Xms32m -XX:+UseCompressedOops -XX:+UseZST
   openjdk: -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:ZUncommitDelay=30 -XX:ZCollectionInterval=60
-  openj9: -XX:+IdleTuningCompactOnIdle -XX:+IdleTuningGcOnIdle -XX:IdleTuningMinIdleWaitTime=1 -Xjit:waitTimeToEnterDeepIdleMode=1000
+  openj9: -XX:+IdleTuningCompactOnIdle -XX:+IdleTuningGcOnIdle -XX:IdleTuningMinIdleWaitTime=10 -Xjit:waitTimeToEnterDeepIdleMode=10000 -Xgc:noConcurrentMark  
   adoptopenjdk: -XX:+UnlockExperimentalVMOptions -XX:+UseShenandoahGC -XX:ShenandoahGCHeuristics=compact
   liberica: -XX:+UseG1GC -XX:G1PeriodicGCInterval=10k
-  dragonwell: -Xmx3g -Xms3g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=300000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10
+  dragonwell: -Xmx3g -Xms3g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+G1ElasticHeap -XX:+ElasticHeapPeriodicUncommit -XX:ElasticHeapPeriodicYGCIntervalMillis=10000 -XX:ElasticHeapYGCIntervalMinMillis=1000 -XX:ElasticHeapInitialMarkIntervalMinMillis=1000 -XX:ElasticHeapPeriodicInitialMarkIntervalMillis=60000 -XX:ElasticHeapPeriodicUncommitStartupDelay=1 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10 -XX:ElasticHeapPeriodicUncommitStartupDelay=10 -XX:ElasticHeapPeriodicMinYoungCommitPercent=10 -XX:ElasticHeapMinYoungCommitPercent=5
 
 onInstall:
  - labelNodes
