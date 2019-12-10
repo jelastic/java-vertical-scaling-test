@@ -1,0 +1,39 @@
+type: update
+description: |
+    Java vertical scaling test on Kubernetes: C4 @ Zing Azul Systems
+
+    **Important!** Apply this Add-On to a Kubernetes Cluster with **4** worker nodes.
+    Each pod is deployed to its dedicated labeled node to easily track memory utilization.
+
+
+name: Java Vertical Scaling on Kubernetes
+logo: https://github.com/jelastic/java-vertical-scaling-test/raw/master/kubernetes/images/kube.png
+baseUrl: https://raw.githubusercontent.com/jelastic/java-vertical-scaling-test/master/kubernetes
+
+globals:
+  # keep \\\\n for sed replacement!!!
+  name: zing
+  image: devbeta/javaengine:zing-11.0.0
+  cmd: java --uninstall; echo -ne '\\\\n' | java -jar app.jar 100 2
+  limit: 3Gi
+  cloudlets: 40
+  common: -Xms32m -XX:+UseCompressedOops -XX:+UseZST
+  container1: Xmx64m
+  container2: Xmx256m
+  container3: Xmx512m
+  container4: Xmx2024m
+  opts-container1: -Xmx64m
+  opts-container2: -Xmx256m 
+  opts-container3: -Xmx512m 
+  opts-container4: -Xmx2024m 
+
+mixins:
+ - manifests/actions.jps
+
+onInstall:
+   - labelNodes
+   - renameNodes
+   - setCloudlets
+   - deploy
+   - monit
+success: ${globals.success}
