@@ -18,10 +18,10 @@ globals:
   limit: 3Gi
   cloudlets: 40
   common: -Xms32m -XX:+UseCompressedOops -XX:+UseZST
-  container1: Xmx64m
-  container2: Xmx256m
-  container3: Xmx512m
-  container4: Xmx2024m
+  container1: xmx64m
+  container2: xmx256m
+  container3: xmx512m
+  container4: xmx2024m
   opts-container1: -Xmx64m
   opts-container2: -Xmx256m 
   opts-container3: -Xmx512m 
