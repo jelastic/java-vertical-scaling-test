@@ -61,10 +61,11 @@ actions:
        curl -s -k -u "admin:${grafana_secret}" -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d @java-dashboard-memory.json  http://${env.domain}/grafana/api/dashboards/db/
        curl -s -k -u "admin:${grafana_secret}" -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d @java-dashboard-cpu1.json  http://${env.domain}/grafana/api/dashboards/db/
        rm java-dashboard-cpu.json  java-dashboard-mem.json || true
-       curl ${baseUrl}/deployments/deployment.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.opts-container1}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | sed "s/%NAME%/${globals.container1}/g" | sed "s/%NODE%/${globals.container1}/g" | sed "s@%IMAGE%@${globals.image}@g" | kubectl apply -f -
-       curl ${baseUrl}/deployments/deployment.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.opts-container2}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | sed "s/%NAME%/${globals.container2}/g" | sed "s/%NODE%/${globals.container2}/g" | sed "s@%IMAGE%@${globals.image}@g" | kubectl apply -f -
-       curl ${baseUrl}/deployments/deployment.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.opts-container3}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | sed "s/%NAME%/${globals.container3}/g" | sed "s/%NODE%/${globals.container3}/g" |sed "s@%IMAGE%@${globals.image}@g" | kubectl apply -f -
-       curl ${baseUrl}/deployments/deployment.yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.opts-container4}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | sed "s/%NAME%/${globals.container4}/g" | sed "s/%NODE%/${globals.container4}/g" | sed "s@%IMAGE%@${globals.image}@g" | kubectl apply -f -
+       yaml=${baseUrl}/deployments/deployment.yaml?_r=${fn.random}
+       curl $yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.opts-container1}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | sed "s/%NAME%/${globals.container1}/g" | sed "s/%NODE%/${globals.container1}/g" | sed "s@%IMAGE%@${globals.image}@g" | kubectl apply -f -
+       curl $yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.opts-container2}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | sed "s/%NAME%/${globals.container2}/g" | sed "s/%NODE%/${globals.container2}/g" | sed "s@%IMAGE%@${globals.image}@g" | kubectl apply -f -
+       curl $yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.opts-container3}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | sed "s/%NAME%/${globals.container3}/g" | sed "s/%NODE%/${globals.container3}/g" |sed "s@%IMAGE%@${globals.image}@g" | kubectl apply -f -
+       curl $yaml | sed "s/%JAVA_OPTS%/${globals.common} ${globals.opts-container4}/g" | sed "s/%MEM_LIMIT%/${globals.limit}/g" | sed "s/%CMD%/${globals.cmd}/g" | sed "s/%NAME%/${globals.container4}/g" | sed "s/%NODE%/${globals.container4}/g" | sed "s@%IMAGE%@${globals.image}@g" | kubectl apply -f -
 
 
   monit:
