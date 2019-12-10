@@ -29,6 +29,10 @@ spec:
               memory: %MEM_LIMIT%
           image: %IMAGE%
           imagePullPolicy: Always
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_TIME", "SYS_RAWIO", "SYS_ADMIN", "ALL"]
           env:
           - name: _JAVA_OPTIONS
             value: %JAVA_OPTS%
