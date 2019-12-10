@@ -28,7 +28,7 @@ globals:
   opts-container4: -Xmx2024m 
 
 mixins:
- - manifests/actions.jps
+ - manifests/actions.jps?_r=${fn.random}
 
 onInstall:
    - labelNodes
