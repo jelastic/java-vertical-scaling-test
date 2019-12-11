@@ -81,7 +81,7 @@ nodes:
     displayName: C4 @ Zing 
     startService: false
     env:
-      _JAVA_OPTIONS: -Xmx500m -Xms32m -XX:+UseCompressedOops -XX:+UseZST
+      _JAVA_OPTIONS: -Xmx500m -XX:+UseCompressedOops -XX:+UseZST
       
   - nodeType: javaengine
     tag: zulujdk-12.0.2
