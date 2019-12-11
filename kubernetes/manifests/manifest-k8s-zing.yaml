@@ -17,14 +17,14 @@ globals:
   cmd: java --uninstall; echo -ne '\\\\n' | java -jar app.jar 100 2
   limit: 3Gi
   cloudlets: 40
-  common: -XX:+UseCompressedOops -XX:+UseZST
-  container1: xmx64m
-  container2: xmx256m
-  container3: xmx512m
+  common: -XX:+UseCompressedOops -XX:+UseZST -XX:-AutoTuneResourceDefaultsBasedOnXmx 
+  container1: xmx256m
+  container2: xmx512m
+  container3: xmx1024m
   container4: xmx2024m
-  opts-container1: -Xmx64m
-  opts-container2: -Xmx256m 
-  opts-container3: -Xmx512m 
+  opts-container1: -Xmx256m 
+  opts-container2: -Xmx512m 
+  opts-container3: -Xmx1024m
   opts-container4: -Xmx2024m 
 
 mixins:
