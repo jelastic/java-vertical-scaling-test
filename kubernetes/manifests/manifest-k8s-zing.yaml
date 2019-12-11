@@ -17,7 +17,7 @@ globals:
   cmd: java --uninstall; echo -ne '\\\\n' | java -jar app.jar 100 2
   limit: 3Gi
   cloudlets: 40
-  common: -Xms32m -XX:+UseCompressedOops -XX:+UseZST
+  common: -XX:+UseCompressedOops -XX:+UseZST
   container1: xmx64m
   container2: xmx256m
   container3: xmx512m
