@@ -7,3 +7,5 @@ A simple app for testing JVM vertical scaling
 * $JAVA_OPTS - JVM start options, for example -Xmx2g -Xms32m -XX:+UseG1GC
 * sleep - interval between memory load cycles in milliseconds, default is 10ms 
 </small>
+
+Press \<Enter\> to start the load test!
